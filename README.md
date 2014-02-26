@@ -5,7 +5,7 @@ MvcRouteFlow **will be** a [NuGet](http://nuget.org/) package that allows you to
 
 ## Integrating MvcRouteFlow into your web project
 
-### Step 1: Register MvcRouteFlow in global.asax.vb
+### Register MvcRouteFlow in global.asax.vb
 
 	protected void Application_Start()
     {

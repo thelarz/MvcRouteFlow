@@ -22,7 +22,7 @@ Here's a sample controller (also available in the repo).
         return RouteFlow.Begin("create-article");
     }
 
-    [RouteFlow(Path = "create-multi-step-widget", Id = 1, Select = When.Auto)]
+    [RouteFlow(Path = "create-multi-step-widget", Step = 1, Select = When.Auto)]
     public ActionResult Page1()
     {
         return View();
@@ -34,7 +34,7 @@ Here's a sample controller (also available in the repo).
         return RouteFlow.Next();
     }
 
-    [RouteFlow(Path = "create-multi-step-widget", Id = 2, Select = When.Auto)]
+    [RouteFlow(Path = "create-multi-step-widget", Step = 2, Select = When.Auto)]
     public ActionResult Page2()
     {
         return View();
@@ -46,7 +46,7 @@ Here's a sample controller (also available in the repo).
         return RouteFlow.Next();
     }
 
-    [RouteFlow(Path = "create-multi-step-widget", Id = 3, Select = When.Auto)]
+    [RouteFlow(Path = "create-multi-step-widget", Step = 3, Select = When.Auto)]
     public ActionResult Page3()
     {
         return View();

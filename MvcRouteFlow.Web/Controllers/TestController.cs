@@ -16,7 +16,7 @@ namespace MvcRouteFlow.Web.Controllers
             return RouteFlow.Begin("create-article");
         }
 
-        [RouteFlow(Path = "create-article", Id = 1, Select = When.Auto)]
+        [RouteFlow(Path = "create-article", Step = 1, Select = When.Auto)]
         public ActionResult Page1()
         {
             return View();
@@ -28,7 +28,7 @@ namespace MvcRouteFlow.Web.Controllers
             return RouteFlow.Next();
         }
 
-        [RouteFlow(Path = "create-article", Id = 2, Select = When.Auto)]
+        [RouteFlow(Path = "create-article", Step = 2, Select = When.Auto)]
         public ActionResult Page2()
         {
             return View();
@@ -40,7 +40,7 @@ namespace MvcRouteFlow.Web.Controllers
             return RouteFlow.Next();
         }
 
-        [RouteFlow(Path = "create-article", Id = 3, Select = When.Auto)]
+        [RouteFlow(Path = "create-article", Step = 3, Select = When.Auto)]
         public ActionResult Page3()
         {
             return View();

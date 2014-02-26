@@ -141,12 +141,12 @@ namespace MvcRouteFlow
                         Paths.Add(path);
                     }
 
-                    var step = path.Steps.FirstOrDefault(x => x.Id == attr.Id);
+                    var step = path.Steps.FirstOrDefault(x => x.Id == attr.Step);
                     if (step == null)
                     {
                         step = new Step()
                                        {
-                                           Id = attr.Id,
+                                           Id = attr.Step,
                                            Endpoints = new List<Endpoint>()
                                        };
                         path.Steps.Add(step);

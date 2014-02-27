@@ -5,6 +5,7 @@ MvcRouteFlow **will be** a [NuGet](http://nuget.org/) package that allows you to
 ## Current Limitations ##
 
 * State is stored in a static variable and will be destroyed if the app pool recycles. Boom.
+* Uses SessionId to identify the state. One state per SessionId at one time.
 
 ## Integrating MvcRouteFlow into your web project
 
@@ -47,7 +48,7 @@ Here's a sample controller (also available in the repo).
             return View();
         }
 
-        [RouteFlow(Path = "create-article", Step = 2, Select = When.No)]
+        [RouteFlow(Path = "create-article", Step = 2, Select = When.No, Label = "No thanks")]
         public ActionResult Page2No()
         {
             return View();
@@ -78,6 +79,15 @@ Here's a sample controller (also available in the repo).
         }
 
     }
+
+
+### RouteFlow Attributes ###
+
+* Path - Free text RouteFlow path used to link several steps together.
+* Step - Control the order the actions appear in the RouteFlow.
+* Select - See **Select Directives** below.
+* Question - Displayed on the RouteFlow interstitial.
+* Label - Used for When.Yes/No to label the links on the RouteFlow interstitial.
 
 ### Select Directives ###
 

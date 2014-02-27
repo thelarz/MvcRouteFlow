@@ -4,11 +4,19 @@
     ViewBag.Title = "RouteFlow";
 }
 
-<h2>RouteFlow Has a Question For You</h2>
+<h2>RouteFlow has a question for you</h2>
+
+<br />
+<br />
+
+<p style="text-align: center;">
+    @Model.Question
+</p>
 
 
-@Model.Question
 
+<p style="text-align: center;">
+    <a href="@Url.Action(Model.NoAction, Model.NoController)">@Model.NoLabel</a>
+    <a href="@Url.Action(Model.YesAction, Model.YesController)">@Model.YesLabel</a>
+</p>
 
-<a href="@Url.Action(Model.NoAction, Model.NoController)">@Model.NoLabel</a>
-<a href="@Url.Action(Model.YesAction, Model.YesController)">@Model.YesLabel</a>

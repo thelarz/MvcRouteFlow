@@ -34,7 +34,7 @@ namespace MvcRouteFlow.Web.Controllers
             return View();
         }
 
-        [RouteFlow(Path = "create-article", Step = 2, Select = When.No)]
+        [RouteFlow(Path = "create-article", Step = 2, Select = When.No, Label = "No thanks")]
         public ActionResult Page2No()
         {
             return View();

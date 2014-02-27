@@ -10,6 +10,8 @@ using MvcRouteFlow.Web.Models;
 namespace MvcRouteFlow.Web
 {
 
+    // Probably incorporate webactivator 
+
     public static class MvcRouteFlowConfig
     {
         public static void RegisterRouteFlow()

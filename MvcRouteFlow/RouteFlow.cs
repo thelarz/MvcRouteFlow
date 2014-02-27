@@ -13,14 +13,18 @@ using System.Web.UI.WebControls;
 
 namespace MvcRouteFlow
 {
+
     public class PathManager
     {
-        
+        // TODO: extract the path access from the RouteFlow class so it can be tested
     }
 
     public class RouteFlow
     {
 
+        //TODO: Get rid of all the static crap.
+
+        //TODO: Would like this to be injected by the consumer if desired.
         public static StateManager StateManager { get; set; }
 
         static readonly List<Path> Paths = new List<Path>();
@@ -171,12 +175,19 @@ namespace MvcRouteFlow
 
         public static void Register()
         {
+
+            //TODO: Extract to its own class and write some unit tests around this
+
+            // http://stackoverflow.com/questions/15844380/scan-for-all-actions-in-the-site
+
             var controllers = Assembly.GetCallingAssembly().GetTypes().Where(type => type.IsSubclassOf(typeof(Controller))).ToList();
             controllers.ForEach((x) => GetActions(x));
         }
         
         private static void GetActions(Type controller)
         {
+
+            //TODO: Extract to its own class and write some unit tests around this
 
             // Get a descriptor of this controller
             var controllerDesc = new ReflectedControllerDescriptor(controller);

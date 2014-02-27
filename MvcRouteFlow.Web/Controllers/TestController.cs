@@ -26,7 +26,7 @@ namespace MvcRouteFlow.Web.Controllers
             Message = "Thanks for completing step one", Question = "Would you like to move on?")]
         public ActionResult Page1(string post)
         {
-            return RouteFlow.Next();
+            return RouteFlow.Next(this, new { id = 22 });
         }
 
         [RouteFlow(Path = "create-article", Step = 2, Select = When.Yes)]
@@ -44,11 +44,11 @@ namespace MvcRouteFlow.Web.Controllers
         [HttpPost]
         public ActionResult Page2(string post)
         {
-            return RouteFlow.Next();
+            return RouteFlow.Next(this, new { id = 22 });
         }
 
         [RouteFlow(Path = "create-article", Step = 3, Select = When.Auto)]
-        public ActionResult Page3()
+        public ActionResult Page3(int id)
         {
             return View();
         }
@@ -56,7 +56,7 @@ namespace MvcRouteFlow.Web.Controllers
         [HttpPost]
         public ActionResult Page3(string post)
         {
-            return RouteFlow.Next();
+            return RouteFlow.Next(this);
         }
 
         [RouteFlow(Path = "create-article", Select = When.Done)]

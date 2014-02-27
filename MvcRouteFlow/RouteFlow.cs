@@ -70,8 +70,15 @@ namespace MvcRouteFlow
             return endpoint;
         }
 
-        public static ActionResult Next()
+        public static ActionResult Next(Controller controller)
         {
+            return Next(controller, null);
+        }
+
+        public static ActionResult Next(Controller controller, object ids)
+        {
+
+            var routeValues = GetRouteValueDictionary(ids);
 
             var cookie = HttpContext.Current.Session.SessionID;
 
@@ -94,12 +101,20 @@ namespace MvcRouteFlow
                 state.Step++;
                 var steps = GetNextSteps(state.Path, state.Step);
 
-                
-                model.YesController = steps.First(x => x.Select == When.Yes).Controller;
-                model.YesAction = steps.First(x => x.Select == When.Yes).Action;
+
+                model.YesRoute = controller.Url.Action(steps.First(x => x.Select == When.Yes).Action,
+                                                       steps.First(x => x.Select == When.Yes).Controller, routeValues);
+
+                //model.YesController = steps.First(x => x.Select == When.Yes).Controller;
+                //model.YesAction = steps.First(x => x.Select == When.Yes).Action;
                 model.YesLabel = steps.First(x => x.Select == When.Yes).Label ?? "Yes";
-                model.NoController = steps.First(x => x.Select == When.No).Controller;
-                model.NoAction = steps.First(x => x.Select == When.No).Action;
+
+                model.NoRoute = controller.Url.Action(steps.First(x => x.Select == When.No).Action,
+                                                       steps.First(x => x.Select == When.No).Controller, routeValues);
+
+
+                //model.NoController = steps.First(x => x.Select == When.No).Controller;
+                //model.NoAction = steps.First(x => x.Select == When.No).Action;
                 model.NoLabel = steps.First(x => x.Select == When.No).Label ?? "No";
 
                 var view = new ViewResult()
@@ -126,7 +141,25 @@ namespace MvcRouteFlow
                 return null;
             }
 
-            return new RedirectToRouteResult(new RouteValueDictionary(new { controller = result.Controller, action = result.Action }));
+            routeValues.Add("controller", result.Controller);
+            routeValues.Add("action", result.Action);
+
+            return new RedirectToRouteResult(routeValues);
+
+        }
+
+        private static RouteValueDictionary GetRouteValueDictionary(object ids)
+        {
+            var routeValues = new RouteValueDictionary();
+            if (ids != null)
+            {
+                foreach (var prop in ids.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    routeValues.Add(prop.Name, prop.GetValue(ids, null));
+                }
+            }
+
+            return routeValues;
 
         }
 
@@ -141,14 +174,14 @@ namespace MvcRouteFlow
 
         }
 
-        public static IEnumerable<Endpoint> GetNextSteps(string path, int step)
+        public static List<Endpoint> GetNextSteps(string path, int step)
         {
             var curr =
                 Paths.FirstOrDefault(x => x.Key == path)
                       .Steps.FirstOrDefault(s => s.Id == step);
 
             var endpoints = curr.Endpoints.Where(e => e.Select == When.Yes || e.Select == When.No);
-            return endpoints;
+            return endpoints.ToList();
 
         }
 

@@ -1,7 +1,10 @@
 MvcRouteFlow
 ============
-
 MvcRouteFlow **will be** a [NuGet](http://nuget.org/) package that allows you to link ASP.NET MVC Routes together into a workflow using attributes on the Controller Action.
+
+## Current Limitations ##
+
+* State is stored in a static variable and will be destroyed if the app pool recycles. Boom.
 
 ## Integrating MvcRouteFlow into your web project
 
@@ -17,52 +20,72 @@ MvcRouteFlow **will be** a [NuGet](http://nuget.org/) package that allows you to
 
 Here's a sample controller (also available in the repo).
 
-	public ActionResult Index()
+	public class TestController : Controller
     {
-        return RouteFlow.Begin("create-article");
+        
+        public ActionResult Index()
+        {
+            return RouteFlow.Begin("create-article");
+        }
+
+        [RouteFlow(Path = "create-article", Step = 1, Select = When.Auto)]
+        public ActionResult Page1()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [RouteFlow(Path = "create-article", Step = 1, Select = When.After, Question = "Thanks for completing step one, would you like to move on?")]
+        public ActionResult Page1(string post)
+        {
+            return RouteFlow.Next();
+        }
+
+        [RouteFlow(Path = "create-article", Step = 2, Select = When.Yes)]
+        public ActionResult Page2()
+        {
+            return View();
+        }
+
+        [RouteFlow(Path = "create-article", Step = 2, Select = When.No)]
+        public ActionResult Page2No()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Page2(string post)
+        {
+            return RouteFlow.Next();
+        }
+
+        [RouteFlow(Path = "create-article", Step = 3, Select = When.Auto)]
+        public ActionResult Page3()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Page3(string post)
+        {
+            return RouteFlow.Next();
+        }
+
+        [RouteFlow(Path = "create-article", Select = When.Done)]
+        public ActionResult Done()
+        {
+            return View();
+        }
+
     }
 
-    [RouteFlow(Path = "create-multi-step-widget", Step = 1, Select = When.Auto)]
-    public ActionResult Page1()
-    {
-        return View();
-    }
+### Select Directives ###
 
-    [HttpPost]
-    public ActionResult Page1(string post)
-    {
-        return RouteFlow.Next();
-    }
-
-    [RouteFlow(Path = "create-multi-step-widget", Step = 2, Select = When.Auto)]
-    public ActionResult Page2()
-    {
-        return View();
-    }
-
-    [HttpPost]
-    public ActionResult Page2(string post)
-    {
-        return RouteFlow.Next();
-    }
-
-    [RouteFlow(Path = "create-multi-step-widget", Step = 3, Select = When.Auto)]
-    public ActionResult Page3()
-    {
-        return View();
-    }
-
-    [HttpPost]
-    public ActionResult Page3(string post)
-    {
-        return RouteFlow.Next();
-    }
-
-    [RouteFlow(Path = "create-multi-step-widget", Select = When.Done)]
-    public ActionResult Done()
-    {
-        return View();
-    }
+* Auto - Selected when the current step matches.
+* After - This directive tells RouteFlow to render an interstitial and as the user a question.
+* Yes - Selected when a user selects the YES option on a RouteFlow interstitial.
+* No - Selected when a user selects the NO option on a RouteFlow interstitial.
+* Done - Selected when the last step is completed.
 
 
 ## Controlling RouteFlow ##

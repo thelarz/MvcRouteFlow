@@ -8,7 +8,8 @@ namespace MvcRouteFlow
         Auto,
         Yes,
         No,
-        Done
+        Done,
+        After
     }
 
     public class Path
@@ -31,6 +32,8 @@ namespace MvcRouteFlow
         public When Select { get; set; }
         public string Controller { get; set; }
         public string Action { get; set; }
+        public string Question { get; set; }
+        public string Label { get; set; }
     }
 
 }

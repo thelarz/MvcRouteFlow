@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -8,15 +9,27 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
+using System.Web.UI.WebControls;
 
 namespace MvcRouteFlow
 {
+    public class PathManager
+    {
+        
+    }
 
     public class RouteFlow
     {
 
-        static readonly List<State> States = new List<State>(); 
+        public static StateManager StateManager { get; set; }
+
         static readonly List<Path> Paths = new List<Path>();
+
+        static RouteFlow()
+        {
+            StateManager = new StateManager();
+        }
+
 
         public static ActionResult Begin(string path)
         {
@@ -31,17 +44,12 @@ namespace MvcRouteFlow
 
             var cookie = HttpContext.Current.Session.SessionID;
 
-            var state = States.FirstOrDefault(x => x.SessionCookie == cookie);
-            if (state == null)
-            {
-                state = new State()
-                {
-                    SessionCookie = cookie,
-                    Path = path,
-                    Step = 1
-                };
-                States.Add(state);
-            }
+            StateManager.CreateState(new State()
+                                            {
+                                                SessionCookie = cookie,
+                                                Path = path,
+                                                Step = 1
+                                            });
 
             var result = GetStartingEndpoint(path);
 
@@ -60,24 +68,81 @@ namespace MvcRouteFlow
 
         public static ActionResult Next()
         {
+
             var cookie = HttpContext.Current.Session.SessionID;
 
-            var state = States.FirstOrDefault(x => x.SessionCookie == cookie);
+            var state = StateManager.GetState(cookie);
             if (state == null)
             {
                 throw new ApplicationException("SessionID not valid in RouteFlow table");
             }
 
+            var e = GetAfter(state.Path, state.Step);
+            if (e != null)
+            {
+                // "After" question exists, load the model with the question text
+                dynamic model = new ExpandoObject();
+
+                model.Question = e.Question;
+           
+                // Get the next step and load the model with the controller/actions for the different responses
+                state.Step++;
+                var steps = GetNextSteps(state.Path, state.Step);
+
+                model.YesController = steps.First(x => x.Select == When.Yes).Controller;
+                model.YesAction = steps.First(x => x.Select == When.Yes).Action;
+                model.YesLabel = steps.First(x => x.Select == When.Yes).Label ?? "Yes";
+                model.NoController = steps.First(x => x.Select == When.No).Controller;
+                model.NoAction = steps.First(x => x.Select == When.No).Action;
+                model.NoLabel = steps.First(x => x.Select == When.No).Label ?? "No";
+
+                var view = new ViewResult()
+                               {
+                                   ViewName = "RouteFlow",
+                                   ViewData = new ViewDataDictionary(model)
+                               };
+
+                view.ViewData.Model = model;
+
+                return view;
+            
+            }
+
+            // Normal step next, 
             var result = GetNextEndpoint(state.Path, state.Step);
+
+            // This feels slightly wrong.
+            state.Step++;
 
             if (result == null)
             {
+                // stumped
                 return null;
             }
 
-            state.Step++;
-
             return new RedirectToRouteResult(new RouteValueDictionary(new { controller = result.Controller, action = result.Action }));
+
+        }
+
+        public static Endpoint GetAfter(string path, int step)
+        {
+            var curr =
+                Paths.FirstOrDefault(x => x.Key == path)
+                      .Steps.FirstOrDefault(s => s.Id == step);
+
+            var endpoint = curr.Endpoints.FirstOrDefault(e => e.Select == When.After);
+            return endpoint;
+
+        }
+
+        public static IEnumerable<Endpoint> GetNextSteps(string path, int step)
+        {
+            var curr =
+                Paths.FirstOrDefault(x => x.Key == path)
+                      .Steps.FirstOrDefault(s => s.Id == step);
+
+            var endpoints = curr.Endpoints.Where(e => e.Select == When.Yes || e.Select == When.No);
+            return endpoints;
 
         }
 
@@ -160,7 +225,9 @@ namespace MvcRouteFlow
                                            {
                                                Controller = controllerDesc.ControllerName,
                                                Action = action.ActionName,
-                                               Select = attr.Select
+                                               Select = attr.Select,
+                                               Question = attr.Question,
+                                               Label = attr.Label
                                            });
                     }
 

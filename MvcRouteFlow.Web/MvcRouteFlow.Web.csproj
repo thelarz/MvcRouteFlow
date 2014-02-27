@@ -308,6 +308,8 @@
     <Content Include="Views\Test\Page1.cshtml" />
     <Content Include="Views\Test\Page3.cshtml" />
     <Content Include="Views\Test\Done.cshtml" />
+    <Content Include="Views\Shared\RouteFlow.cshtml" />
+    <Content Include="Views\Test\Page2No.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

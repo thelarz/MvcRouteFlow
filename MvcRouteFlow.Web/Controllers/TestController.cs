@@ -22,7 +22,8 @@ namespace MvcRouteFlow.Web.Controllers
         }
 
         [HttpPost]
-        [RouteFlow(Path = "create-article", Step = 1, Select = When.After, Question = "Thanks for completing step one, would you like to move on?")]
+        [RouteFlow(Path = "create-article", Step = 1, Select = When.After, 
+            Message = "Thanks for completing step one", Question = "Would you like to move on?")]
         public ActionResult Page1(string post)
         {
             return RouteFlow.Next();

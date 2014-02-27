@@ -36,7 +36,8 @@ Here's a sample controller (also available in the repo).
         }
 
         [HttpPost]
-        [RouteFlow(Path = "create-article", Step = 1, Select = When.After, Question = "Thanks for completing step one, would you like to move on?")]
+        [RouteFlow(Path = "create-article", Step = 1, Select = When.After, 
+            Message = "Thanks for completing step one", Question = "Would you like to move on?")]
         public ActionResult Page1(string post)
         {
             return RouteFlow.Next();
@@ -86,6 +87,7 @@ Here's a sample controller (also available in the repo).
 * Path - Free text RouteFlow path used to link several steps together.
 * Step - Control the order the actions appear in the RouteFlow.
 * Select - See **Select Directives** below.
+* Message - A message you can display to the user on the RouteFlow interstitial.
 * Question - Displayed on the RouteFlow interstitial.
 * Label - Used for When.Yes/No to label the links on the RouteFlow interstitial.
 

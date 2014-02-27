@@ -88,11 +88,13 @@ namespace MvcRouteFlow
                 dynamic model = new ExpandoObject();
 
                 model.Question = e.Question;
-           
+                model.Message = e.Message;
+
                 // Get the next step and load the model with the controller/actions for the different responses
                 state.Step++;
                 var steps = GetNextSteps(state.Path, state.Step);
 
+                
                 model.YesController = steps.First(x => x.Select == When.Yes).Controller;
                 model.YesAction = steps.First(x => x.Select == When.Yes).Action;
                 model.YesLabel = steps.First(x => x.Select == When.Yes).Label ?? "Yes";
@@ -234,10 +236,11 @@ namespace MvcRouteFlow
                     {
                         step.Endpoints.Add(new Endpoint()
                                            {
+                                               Select = attr.Select,
+                                               Message = attr.Message,
+                                               Question = attr.Question,
                                                Controller = controllerDesc.ControllerName,
                                                Action = action.ActionName,
-                                               Select = attr.Select,
-                                               Question = attr.Question,
                                                Label = attr.Label
                                            });
                     }

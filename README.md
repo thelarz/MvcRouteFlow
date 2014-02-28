@@ -9,7 +9,7 @@ MvcRouteFlow **will be** a [NuGet](http://nuget.org/) package that allows you to
 
 ## Integrating MvcRouteFlow into your web project
 
-### Register MvcRouteFlow in global.asax.vb
+### Register MvcRouteFlow in global.asax.cs
 
 	protected void Application_Start()
     {
@@ -26,30 +26,30 @@ Here's a sample controller (also available in the repo).
         
         public ActionResult Index()
         {
-            return RouteFlow.Begin("create-article");
+            return RouteFlow.Begin("test-path");
         }
 
-        [RouteFlow(Path = "create-article", Step = 1, Select = When.Auto)]
+        [RouteFlow(Path = "test-path", Step = 1, Select = When.Auto)]
         public ActionResult Page1()
         {
             return View();
         }
 
         [HttpPost]
-        [RouteFlow(Path = "create-article", Step = 1, Select = When.After, 
+        [RouteFlow(Path = "test-path", Step = 1, Select = When.After, 
             Message = "Thanks for completing step one", Question = "Would you like to move on?")]
         public ActionResult Page1(string post)
         {
-            return RouteFlow.Next();
+            return RouteFlow.Next(this, new { id = 22 });
         }
 
-        [RouteFlow(Path = "create-article", Step = 2, Select = When.Yes)]
+        [RouteFlow(Path = "test-path", Step = 2, Select = When.Yes)]
         public ActionResult Page2()
         {
             return View();
         }
 
-        [RouteFlow(Path = "create-article", Step = 2, Select = When.No, Label = "No thanks")]
+        [RouteFlow(Path = "test-path", Step = 2, Select = When.No, Label = "No thanks")]
         public ActionResult Page2No()
         {
             return View();
@@ -58,11 +58,11 @@ Here's a sample controller (also available in the repo).
         [HttpPost]
         public ActionResult Page2(string post)
         {
-            return RouteFlow.Next();
+            return RouteFlow.Next(this, new { id = 22 });
         }
 
-        [RouteFlow(Path = "create-article", Step = 3, Select = When.Auto)]
-        public ActionResult Page3()
+        [RouteFlow(Path = "test-path", Step = 3, Select = When.Auto)]
+        public ActionResult Page3(int id)
         {
             return View();
         }
@@ -70,10 +70,10 @@ Here's a sample controller (also available in the repo).
         [HttpPost]
         public ActionResult Page3(string post)
         {
-            return RouteFlow.Next();
+            return RouteFlow.Next(this);
         }
 
-        [RouteFlow(Path = "create-article", Select = When.Done)]
+        [RouteFlow(Path = "test-path", Select = When.Done)]
         public ActionResult Done()
         {
             return View();

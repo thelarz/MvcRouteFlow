@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
@@ -44,9 +45,10 @@ namespace MvcRouteFlow
 
 
 
-            //HttpContext.Current.Session["routeflow"] = path;
+            HttpContext.Current.Session["routeflow"] = path;
 
             var cookie = HttpContext.Current.Session.SessionID;
+            
 
             StateManager.CreateState(new State()
                                             {
@@ -279,9 +281,26 @@ namespace MvcRouteFlow
                     }
 
                 }
-
                
             }
+
+#if DEBUG
+            foreach (var path in Paths)
+            {
+                Trace.WriteLine(string.Format("Path: {0}", path.Key));
+                foreach (var step in path.Steps)
+                {
+                    Trace.WriteLine(string.Format("Step: {0}/{1}", path.Key, step.Id));
+                    foreach (var endpoint in step.Endpoints)
+                    {
+                        Trace.WriteLine(string.Format("Endp: {0}/{1}/{2}/{3}/{4}", path.Key, step.Id, endpoint.Controller, endpoint.Action, endpoint.Select.ToString()));
+                    }
+                }
+            }
+#endif
+
+
+
         }
 
     }

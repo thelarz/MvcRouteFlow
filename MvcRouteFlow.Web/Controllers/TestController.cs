@@ -12,30 +12,30 @@ namespace MvcRouteFlow.Web.Controllers
         
         public ActionResult Index()
         {
-            return RouteFlow.Begin("create-article");
+            return RouteFlow.Begin("path-foo");
         }
 
-        [RouteFlow(Path = "create-article", Step = 1, Select = When.Auto)]
+        [RouteFlow(Path = "path-foo", Step = 1, Select = When.Auto)]
         public ActionResult Page1()
         {
             return View();
         }
 
         [HttpPost]
-        [RouteFlow(Path = "create-article", Step = 1, Select = When.After, 
+        [RouteFlow(Path = "path-foo", Step = 1, Select = When.After, 
             Message = "Thanks for completing step one", Question = "Would you like to move on?")]
         public ActionResult Page1(string post)
         {
             return RouteFlow.Next(this, new { id = 22 });
         }
 
-        [RouteFlow(Path = "create-article", Step = 2, Select = When.Yes)]
+        [RouteFlow(Path = "path-foo", Step = 2, Select = When.Yes)]
         public ActionResult Page2()
         {
             return View();
         }
 
-        [RouteFlow(Path = "create-article", Step = 2, Select = When.No, Label = "No thanks")]
+        [RouteFlow(Path = "path-foo", Step = 2, Select = When.No, Label = "No thanks")]
         public ActionResult Page2No()
         {
             return View();
@@ -47,7 +47,7 @@ namespace MvcRouteFlow.Web.Controllers
             return RouteFlow.Next(this, new { id = 22 });
         }
 
-        [RouteFlow(Path = "create-article", Step = 3, Select = When.Auto)]
+        [RouteFlow(Path = "path-foo", Step = 3, Select = When.Auto)]
         public ActionResult Page3(int id)
         {
             return View();
@@ -59,7 +59,7 @@ namespace MvcRouteFlow.Web.Controllers
             return RouteFlow.Next(this);
         }
 
-        [RouteFlow(Path = "create-article", Select = When.Done)]
+        [RouteFlow(Path = "path-foo", Select = When.Done)]
         public ActionResult Done()
         {
             return View();

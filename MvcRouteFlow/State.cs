@@ -5,5 +5,7 @@ namespace MvcRouteFlow
         public string SessionCookie { get; set; }
         public string Path { get; set; }
         public int Step { get; set; }
+        public int StepCompleted { get; set; }
+        public int StepOnBeforeCompleted { get; set; }
     }
 }

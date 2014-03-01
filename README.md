@@ -21,36 +21,36 @@ MvcRouteFlow **will be** a [NuGet](http://nuget.org/) package that allows you to
 
 Here's a sample controller (also available in the repo).
 
-	public class TestController : Controller
+    public class TestController : Controller
     {
         
         public ActionResult Index()
         {
-            return RouteFlow.Begin("test-path");
+            return RouteFlow.Begin("path-foo");
         }
 
-        [RouteFlow(Path = "test-path", Step = 1, Select = When.Auto)]
+        [RouteFlow(Path = "path-foo", Step = 1, Select = When.Auto)]
         public ActionResult Page1()
         {
             return View();
         }
 
         [HttpPost]
-        [RouteFlow(Path = "test-path", Step = 1, Select = When.After, 
-            Message = "Thanks for completing step one", Question = "Would you like to move on?")]
         public ActionResult Page1(string post)
         {
-            return RouteFlow.Next(this, new { id = 22 });
+            return RouteFlow.Next(new { id = 22 });
         }
 
-        [RouteFlow(Path = "test-path", Step = 2, Select = When.Yes)]
+        [RouteFlow(Path = "path-foo", Step = 2, Select = When.Auto)]
+        [RouteFlowBefore(Path = "path-foo", Step = 2, Message = "Thanks for completing step one", Question = "Please choose OptionA or OptionB")]
+        [RouteFlow(Path = "path-foo", Step = 2, Select = When.Yes, Label = "OptionA")]
         public ActionResult Page2()
         {
             return View();
         }
 
-        [RouteFlow(Path = "test-path", Step = 2, Select = When.No, Label = "No thanks")]
-        public ActionResult Page2No()
+        [RouteFlow(Path = "path-foo", Step = 2, Select = When.No, Label = "OptionB")]
+        public ActionResult Page2B()
         {
             return View();
         }
@@ -58,10 +58,10 @@ Here's a sample controller (also available in the repo).
         [HttpPost]
         public ActionResult Page2(string post)
         {
-            return RouteFlow.Next(this, new { id = 22 });
+            return RouteFlow.Next(new { id = 22 });
         }
 
-        [RouteFlow(Path = "test-path", Step = 3, Select = When.Auto)]
+        [RouteFlow(Path = "path-foo", Step = 3, Select = When.Auto)]
         public ActionResult Page3(int id)
         {
             return View();
@@ -70,35 +70,50 @@ Here's a sample controller (also available in the repo).
         [HttpPost]
         public ActionResult Page3(string post)
         {
-            return RouteFlow.Next(this);
+            return RouteFlow.Next();
         }
 
-        [RouteFlow(Path = "test-path", Select = When.Done)]
+        [RouteFlow(Path = "path-foo", Select = When.Done)]
         public ActionResult Done()
         {
+            RouteFlow.Done();
             return View();
         }
 
     }
 
+### RouteFlow Attributes/Filters ###
 
-### RouteFlow Attributes ###
+* RouteFlow - Main Attribute/Filter to control flow of controller actions.
+* RouteFlowBefore - This filter tells RouteFlow to render an interstitial and as; the user a question.
+* RouteFlowSync - Used to syncronize step numbers after a GoTo has executed.
+
+### RouteFlow Parameters ###
 
 * Path - Free text RouteFlow path used to link several steps together.
 * Step - Control the order the actions appear in the RouteFlow.
 * Select - See **Select Directives** below.
-* Message - A message you can display to the user on the RouteFlow interstitial.
-* Question - Displayed on the RouteFlow interstitial.
 * Label - Used for When.Yes/No to label the links on the RouteFlow interstitial.
+* GoTo - Used with Directive Yes/No to redirect the flow based on the answer given by the user.
 
 ### Select Directives ###
 
 * Auto - Selected when the current step matches.
-* After - This directive tells RouteFlow to render an interstitial and as the user a question.
 * Yes - Selected when a user selects the YES option on a RouteFlow interstitial.
 * No - Selected when a user selects the NO option on a RouteFlow interstitial.
 * Done - Selected when the last step is completed.
 
+### RouteFlowBefore Parameters ###
+
+* Path - Free text RouteFlow path used to link several steps together.
+* Step - Control the order the actions appear in the RouteFlow. 
+* Message - A message you can display to the user on the RouteFlow interstitial.
+* Question - Displayed on the RouteFlow interstitial.
+
+### RouteFlowSync Parameters ###
+
+* Path - Free text RouteFlow path used to link several steps together.
+* Step - Control the order the actions appear in the RouteFlow. 
 
 ## Controlling RouteFlow ##
 
@@ -118,7 +133,7 @@ Moving to the next step involves only telling RouteFlow to do it. Easy user that
 
 	public ActionResult Index()
     {
-        return RouteFlow.Next();
+        return RouteFlow.Next([object routeValues]);
     }
 
 

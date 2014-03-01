@@ -23,6 +23,22 @@ namespace MvcRouteFlow
             return state;
         }
 
+        public void CompleteStep(string id)
+        {
+            var state = GetState(id);
+            if (state != null)
+            {
+                state.StepCompleted = state.Step;
+            }
+        }
+
+        public void SyncronizeSteps(string id, int step)
+        {
+            var state = GetState(id);
+            state.StepCompleted = step - 1;
+            state.Step = step;
+        }
+
         public void RemoveState(string id)
         {
             var state = GetState(id);

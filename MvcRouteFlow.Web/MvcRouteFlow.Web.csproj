@@ -184,6 +184,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\SkipController.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
@@ -309,7 +310,13 @@
     <Content Include="Views\Test\Page3.cshtml" />
     <Content Include="Views\Test\Done.cshtml" />
     <Content Include="Views\Shared\RouteFlow.cshtml" />
-    <Content Include="Views\Test\Page2No.cshtml" />
+    <Content Include="Views\Test\Page2B.cshtml" />
+    <Content Include="Views\Skip\Page4.cshtml" />
+    <Content Include="Views\Skip\Page1.cshtml" />
+    <Content Include="Views\Skip\Page2.cshtml" />
+    <Content Include="Views\Skip\Page3.cshtml" />
+    <Content Include="Views\Skip\Index.cshtml" />
+    <Content Include="Views\Skip\Done.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

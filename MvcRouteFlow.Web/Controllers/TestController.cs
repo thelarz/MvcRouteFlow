@@ -22,21 +22,21 @@ namespace MvcRouteFlow.Web.Controllers
         }
 
         [HttpPost]
-        [RouteFlow(Path = "path-foo", Step = 1, Select = When.After, 
-            Message = "Thanks for completing step one", Question = "Would you like to move on?")]
         public ActionResult Page1(string post)
         {
-            return RouteFlow.Next(this, new { id = 22 });
+            return RouteFlow.Next(new { id = 22 });
         }
 
-        [RouteFlow(Path = "path-foo", Step = 2, Select = When.Yes)]
+        [RouteFlow(Path = "path-foo", Step = 2, Select = When.Auto)]
+        [RouteFlowBefore(Path = "path-foo", Step = 2, Message = "Thanks for completing step one", Question = "Please choose OptionA or OptionB")]
+        [RouteFlow(Path = "path-foo", Step = 2, Select = When.Yes, Label = "OptionA")]
         public ActionResult Page2()
         {
             return View();
         }
 
-        [RouteFlow(Path = "path-foo", Step = 2, Select = When.No, Label = "No thanks")]
-        public ActionResult Page2No()
+        [RouteFlow(Path = "path-foo", Step = 2, Select = When.No, Label = "OptionB")]
+        public ActionResult Page2B()
         {
             return View();
         }
@@ -44,7 +44,7 @@ namespace MvcRouteFlow.Web.Controllers
         [HttpPost]
         public ActionResult Page2(string post)
         {
-            return RouteFlow.Next(this, new { id = 22 });
+            return RouteFlow.Next(new { id = 22 });
         }
 
         [RouteFlow(Path = "path-foo", Step = 3, Select = When.Auto)]
@@ -56,12 +56,13 @@ namespace MvcRouteFlow.Web.Controllers
         [HttpPost]
         public ActionResult Page3(string post)
         {
-            return RouteFlow.Next(this);
+            return RouteFlow.Next();
         }
 
         [RouteFlow(Path = "path-foo", Select = When.Done)]
         public ActionResult Done()
         {
+            RouteFlow.Done();
             return View();
         }
 

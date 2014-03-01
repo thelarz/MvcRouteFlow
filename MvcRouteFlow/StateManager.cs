@@ -13,12 +13,19 @@ namespace MvcRouteFlow
             return States.FirstOrDefault(x => x.SessionCookie == id);
         }
 
-        public State CreateState(State state)
+        public State CreateState(string cookie, string path)
         {
-            if (GetState(state.SessionCookie) != null)
+            if (GetState(cookie) != null)
             {
-                RemoveState(state.SessionCookie);
+                RemoveState(cookie);
             }
+            var state = new State()
+                           {
+                               SessionCookie = cookie,
+                               Path = path,
+                               Step = 1,
+                               CorrelationIds = new Dictionary<string, object>()
+                           };
             States.Add(state);
             return state;
         }
@@ -32,16 +39,24 @@ namespace MvcRouteFlow
             }
         }
 
-        public void SetCorrelationId(string sessionid, object id)
+        public void SetCorrelationId(string sessionid, string name, object id)
         {
             var state = GetState(sessionid);
-            state.CorrelationId = id;
+            if (state.CorrelationIds.ContainsKey(name))
+            {
+                state.CorrelationIds[name] = id;
+            }
+            else
+            {
+                state.CorrelationIds.Add(name ?? id.ToString(), id);    
+            }
+            
         }
 
-        public object GetCorrelationId(string sessionid)
+        public object GetCorrelationId(string sessionid, string name)
         {
             var state = GetState(sessionid);
-            return state.CorrelationId;
+            return state.CorrelationIds[name ?? "id"];
         }
 
         public void SyncronizeSteps(string id, int step)

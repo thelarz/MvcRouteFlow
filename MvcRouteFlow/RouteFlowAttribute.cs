@@ -37,18 +37,6 @@ namespace MvcRouteFlow
 
             RouteFlow.Sync(Step);
 
-
-
-
-
-            //if (!filterContext.HttpContext.User.Identity.IsAuthenticated)
-            //    filterContext.Result = new RedirectToRouteResult(
-            //            new RouteValueDictionary 
-            //            {
-            //                { "action", Action },
-            //                { "controller", Controller },
-            //                { "returnurl", filterContext.HttpContext.Request.RawUrl }
-            //            });
         }
 
 
@@ -75,6 +63,7 @@ namespace MvcRouteFlow
     public class RouteFlowSetCorrelation : ActionFilterAttribute
     {
         public string Path { get; set; }
+        public string As { get; set; }
         public string Value { get; set; }
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
@@ -83,7 +72,7 @@ namespace MvcRouteFlow
                 return;
 
             var actionValues = filterContext.ActionParameters;
-            RouteFlow.SetCorrelationId(actionValues[Value]);
+            RouteFlow.SetCorrelationId(As, actionValues[Value]);
         }
     }
 
@@ -91,7 +80,8 @@ namespace MvcRouteFlow
     public class RouteFlowGetCorrelation : ActionFilterAttribute
     {
         public string Path { get; set; }
-        public string Value { get; set; }
+        public string Name { get; set; }
+        public string AssignTo { get; set; }
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
@@ -99,8 +89,8 @@ namespace MvcRouteFlow
                 return;
 
             var actionValues = filterContext.ActionParameters;
-            if (actionValues.ContainsKey(Value))
-                actionValues[Value] = RouteFlow.GetCorrelationId();
+            if (actionValues.ContainsKey(AssignTo))
+                actionValues[AssignTo] = RouteFlow.GetCorrelationId(Name);
         }
     }
 

@@ -42,8 +42,14 @@ namespace MvcRouteFlow
 
         public static bool OnPath(string path)
         {
+            if (path == null)
+                return false;
+
             var cookie = HttpContext.Current.Session.SessionID;
             var state = StateManager.GetState(cookie);
+            if (state == null)
+                return false;
+
             return (state.Path == path);
         }
 
@@ -86,14 +92,9 @@ namespace MvcRouteFlow
             HttpContext.Current.Session["routeflow"] = path;
 
             var cookie = HttpContext.Current.Session.SessionID;
-            
 
-            StateManager.CreateState(new State()
-                                            {
-                                                SessionCookie = cookie,
-                                                Path = path,
-                                                Step = 1
-                                            });
+
+            StateManager.CreateState(cookie, path);
 
             var result = PathManager.GetStartingEndpoint(path);
 
@@ -101,16 +102,16 @@ namespace MvcRouteFlow
 
         }
 
-        public static void SetCorrelationId(object id)
+        public static void SetCorrelationId(string name, object id)
         {
             var cookie = HttpContext.Current.Session.SessionID;
-            StateManager.SetCorrelationId(cookie, id);
+            StateManager.SetCorrelationId(cookie, name, id);
         }
 
-        public static object GetCorrelationId()
+        public static object GetCorrelationId(string name)
         {
             var cookie = HttpContext.Current.Session.SessionID;
-            return StateManager.GetCorrelationId(cookie);
+            return StateManager.GetCorrelationId(cookie, name);
         }
 
         public static ActionResult Next()

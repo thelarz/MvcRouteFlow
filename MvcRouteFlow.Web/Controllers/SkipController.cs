@@ -30,7 +30,7 @@ namespace MvcRouteFlow.Web.Controllers
 
         [RouteFlow(Path = "path-bar", Step = 2, Select = When.Auto)]
         [RouteFlow(Path = "path-bar", Step = 2, Select = When.No)]
-        [RouteFlow(Path = "path-bar", Step = 2, Select = When.Yes, GoTo = 3)]
+        
         [RouteFlowBefore(Path = "path-bar", Step = 2, Message = "Thanks for completing step one", Question = "Would you like to skip step 2?")]
         public ActionResult Page2(int id)
         {
@@ -47,6 +47,7 @@ namespace MvcRouteFlow.Web.Controllers
         [RouteFlow(Path = "path-bar", Step = 3, Select = When.Before, Message = "Let's move on...", Question = "Would you like to DO step 3?")]
         [RouteFlow(Path = "path-bar", Step = 3, Select = When.Auto)]
         [RouteFlow(Path = "path-bar", Step = 3, Select = When.Yes)]
+        [RouteFlow(Path = "path-bar", Step = 2, Select = When.Yes)]
         [RouteFlowBefore(Path = "path-bar", Step = 3, Message = "Let's move on...", Question = "Would you like to DO step 3?")]
         [RouteFlowSync(Path = "path-bar", Step = 3)]
         public ActionResult Page3(int id)

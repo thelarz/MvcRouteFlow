@@ -32,12 +32,9 @@ namespace MvcRouteFlow
         public string Key { get; set; }
         public bool BeforeWasVisited { get; set; }
         public When Select { get; set; }
-        //public string Message { get; set; }
-        //public string Question { get; set; }
         public string Controller { get; set; }
         public string Action { get; set; }
         public string Label { get; set; }
-        public int GoTo { get; set; }
     }
 
 }

@@ -97,8 +97,6 @@ namespace MvcRouteFlow
 
             var routeValues = filterContext.RouteData.Values;
 
-            //var routeValues = GetRouteValueDictionary(ids);
-
             var cookie = HttpContext.Current.Session.SessionID;
             var state = StateManager.GetState(cookie);
 
@@ -111,29 +109,19 @@ namespace MvcRouteFlow
             var endpoints = PathManager.GetYesNoEndpointsForStep(state.Path, state.Step);
 
             var yesEndpoint = endpoints.First(x => x.Select == When.Yes);
-            if (yesEndpoint.GoTo > 0)
-                yesEndpoint = PathManager.GetEndpoint(state.Path, yesEndpoint.GoTo);
+            //if (yesEndpoint.GoTo > 0)
+            //    yesEndpoint = PathManager.GetEndpoint(state.Path, yesEndpoint.GoTo);
 
             model.YesRoute = 
             model.YesRoute = new UrlHelper(filterContext.RequestContext).Action(yesEndpoint.Action, yesEndpoint.Controller, routeValues);
             model.YesLabel = endpoints.First(x => x.Select == When.Yes).Label ?? "Yes";
 
             var noEndpoint = endpoints.First(x => x.Select == When.No);
-            if (noEndpoint.GoTo > 0)
-                noEndpoint = PathManager.GetEndpoint(state.Path, noEndpoint.GoTo);
+            //if (noEndpoint.GoTo > 0)
+            //    noEndpoint = PathManager.GetEndpoint(state.Path, noEndpoint.GoTo);
 
             model.NoRoute = new UrlHelper(filterContext.RequestContext).Action(noEndpoint.Action, noEndpoint.Controller, routeValues);
             model.NoLabel = endpoints.First(x => x.Select == When.No).Label ?? "No";
-
-
-            //var view = new ViewResult()
-            //{
-            //    ViewName = "RouteFlow",
-            //    ViewData = new ViewDataDictionary(model)
-            //};
-
-            //view.ViewData.Model = model;
-
 
             filterContext.Result = new RedirectToRouteResult(
                     new RouteValueDictionary 
@@ -167,10 +155,8 @@ namespace MvcRouteFlow
 
         }
 
-
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            //RouteFlow.MarkCompleted();
             base.OnActionExecuted(filterContext);
         }
 

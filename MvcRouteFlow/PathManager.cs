@@ -159,9 +159,6 @@ namespace MvcRouteFlow
                         step.Endpoints.Add(new Endpoint()
                                                {
                                                    Select = attr.Select,
-                                                   //Message = attr.Message,
-                                                   //Question = attr.Question,
-                                                   GoTo = attr.GoTo,
                                                    Controller = controllerDesc.ControllerName,
                                                    Action = action.ActionName,
                                                    Label = attr.Label

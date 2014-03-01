@@ -86,7 +86,7 @@ Here's a sample controller (also available in the repo).
 
 * RouteFlow - Main Attribute/Filter to control flow of controller actions.
 * RouteFlowBefore - This filter tells RouteFlow to render an interstitial and as; the user a question.
-* RouteFlowSync - Used to syncronize step numbers after a GoTo has executed.
+* RouteFlowSync - Used to manually syncronize step numbers after a step has been skipped.
 
 ### RouteFlow Parameters ###
 
@@ -94,7 +94,7 @@ Here's a sample controller (also available in the repo).
 * Step - Control the order the actions appear in the RouteFlow.
 * Select - See **Select Directives** below.
 * Label - Used for When.Yes/No to label the links on the RouteFlow interstitial.
-* GoTo - Used with Directive Yes/No to redirect the flow based on the answer given by the user.
+
 
 ### Select Directives ###
 

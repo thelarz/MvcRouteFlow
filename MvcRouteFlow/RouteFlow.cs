@@ -100,7 +100,19 @@ namespace MvcRouteFlow
             return new RedirectToRouteResult(new RouteValueDictionary(new { controller = result.Controller, action = result.Action }));
 
         }
-        
+
+        public static void SetCorrelationId(object id)
+        {
+            var cookie = HttpContext.Current.Session.SessionID;
+            StateManager.SetCorrelationId(cookie, id);
+        }
+
+        public static object GetCorrelationId()
+        {
+            var cookie = HttpContext.Current.Session.SessionID;
+            return StateManager.GetCorrelationId(cookie);
+        }
+
         public static ActionResult Next()
         {
             return Next(null);

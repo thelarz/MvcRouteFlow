@@ -44,7 +44,6 @@ namespace MvcRouteFlow.Web.Controllers
             return RouteFlow.Next(new { id = 22 });
         }
 
-        [RouteFlow(Path = "path-bar", Step = 3, Select = When.Before, Message = "Let's move on...", Question = "Would you like to DO step 3?")]
         [RouteFlow(Path = "path-bar", Step = 3, Select = When.Auto)]
         [RouteFlow(Path = "path-bar", Step = 3, Select = When.Yes)]
         [RouteFlow(Path = "path-bar", Step = 2, Select = When.Yes)]

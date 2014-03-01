@@ -71,6 +71,39 @@ namespace MvcRouteFlow
         public string NoLabel { get; set; }
     }
 
+    [AttributeUsage(AttributeTargets.Method)]
+    public class RouteFlowSetCorrelation : ActionFilterAttribute
+    {
+        public string Path { get; set; }
+        public string Value { get; set; }
+
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            if (!RouteFlow.OnPath(Path))
+                return;
+
+            var actionValues = filterContext.ActionParameters;
+            RouteFlow.SetCorrelationId(actionValues[Value]);
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class RouteFlowGetCorrelation : ActionFilterAttribute
+    {
+        public string Path { get; set; }
+        public string Value { get; set; }
+
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            if (!RouteFlow.OnPath(Path))
+                return;
+
+            var actionValues = filterContext.ActionParameters;
+            if (actionValues.ContainsKey(Value))
+                actionValues[Value] = RouteFlow.GetCorrelationId();
+        }
+    }
+
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class RouteFlowBefore : ActionFilterAttribute
     {
@@ -90,10 +123,12 @@ namespace MvcRouteFlow
             if (!RouteFlow.OnPath(Path))
                 return;
 
+            RouteFlow.Sync(Step);
+
             if (RouteFlow.IsBeforeCompleted())
                 return;
 
-            RouteFlow.Sync(Step);
+            
 
             var routeValues = filterContext.RouteData.Values;
 
@@ -108,15 +143,25 @@ namespace MvcRouteFlow
             // Get the next step and load the model with the controller/actions for the different responses
             var endpoints = PathManager.GetYesNoEndpointsForStep(state.Path, state.Step);
 
-            var yesEndpoint = endpoints.First(x => x.Select == When.Yes);
+            var yesEndpoint = endpoints.FirstOrDefault(x => x.Select == When.Yes);
+
+            if (yesEndpoint == null)
+            {
+                throw new ApplicationException(string.Format("RouteFlow: Cannot find When.Yes route for Question on Path [{0}] Step [{1}]", Path, Step));
+            }
             //if (yesEndpoint.GoTo > 0)
             //    yesEndpoint = PathManager.GetEndpoint(state.Path, yesEndpoint.GoTo);
 
-            model.YesRoute = 
             model.YesRoute = new UrlHelper(filterContext.RequestContext).Action(yesEndpoint.Action, yesEndpoint.Controller, routeValues);
             model.YesLabel = endpoints.First(x => x.Select == When.Yes).Label ?? "Yes";
 
-            var noEndpoint = endpoints.First(x => x.Select == When.No);
+            var noEndpoint = endpoints.FirstOrDefault(x => x.Select == When.No);
+
+            if (noEndpoint == null)
+            {
+                throw new ApplicationException(string.Format("RouteFlow: Cannot find When.No route for Question on Path [{0}] Step [{1}]", Path, Step));
+            }
+
             //if (noEndpoint.GoTo > 0)
             //    noEndpoint = PathManager.GetEndpoint(state.Path, noEndpoint.GoTo);
 

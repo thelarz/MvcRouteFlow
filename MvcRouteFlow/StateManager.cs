@@ -32,6 +32,18 @@ namespace MvcRouteFlow
             }
         }
 
+        public void SetCorrelationId(string sessionid, object id)
+        {
+            var state = GetState(sessionid);
+            state.CorrelationId = id;
+        }
+
+        public object GetCorrelationId(string sessionid)
+        {
+            var state = GetState(sessionid);
+            return state.CorrelationId;
+        }
+
         public void SyncronizeSteps(string id, int step)
         {
             var state = GetState(id);

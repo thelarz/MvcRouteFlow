@@ -7,5 +7,6 @@ namespace MvcRouteFlow
         public int Step { get; set; }
         public int StepCompleted { get; set; }
         public int StepOnBeforeCompleted { get; set; }
+        public object CorrelationId { get; set; }
     }
 }

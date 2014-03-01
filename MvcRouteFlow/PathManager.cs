@@ -54,9 +54,17 @@ namespace MvcRouteFlow
 
         public static Endpoint GetEndpoint(string path, int step)
         {
-            var next =
+            var nextStep =
                 Paths.FirstOrDefault(x => x.Key == path)
                      .Steps.OrderBy(x => x.Id).FirstOrDefault(s => s.Id >= step);
+
+            Endpoint next = null;
+
+            if (nextStep == null)
+                throw new ApplicationException(string.Format(
+                        "RouteFlow: you requested next, there was no more steps after Path [{0}] Step [{1}]", path, step));
+
+            next = nextStep.Endpoints.FirstOrDefault(e => e.Select == When.Auto || e.Select == When.Done);
 
             if (next == null)
             {
@@ -64,14 +72,14 @@ namespace MvcRouteFlow
                                 .Steps.FirstOrDefault(s => s.Endpoints.Any(x => x.Select == When.Done));
 
                 if (done == null)
-                    throw new ApplicationException(
-                        "RouteFlow: you requested next, there was no next route and no When.Done selection");
+                    throw new ApplicationException(string.Format(
+                        "RouteFlow: you requested next, but there were no When.Auto or When.Done endpoints on Path [{0}] after Step [{1}]", path, step));
 
                 return done.Endpoints.First(e => e.Select == When.Done);
 
             }
 
-            return next.Endpoints.FirstOrDefault(e => e.Select == When.Auto);
+            return next;
 
         }
 

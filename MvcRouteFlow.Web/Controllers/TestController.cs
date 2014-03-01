@@ -22,9 +22,10 @@ namespace MvcRouteFlow.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Page1(string post)
+        [RouteFlowSetCorrelation(Path = "path-foo", Value = "id")]
+        public ActionResult Page1(string id)
         {
-            return RouteFlow.Next(new { id = 22 });
+            return RouteFlow.Next();
         }
 
         [RouteFlow(Path = "path-foo", Step = 2, Select = When.Auto)]
@@ -44,11 +45,11 @@ namespace MvcRouteFlow.Web.Controllers
         [HttpPost]
         public ActionResult Page2(string post)
         {
-            return RouteFlow.Next(new { id = 22 });
+            return RouteFlow.Next();
         }
 
         [RouteFlow(Path = "path-foo", Step = 3, Select = When.Auto)]
-        public ActionResult Page3(int id)
+        public ActionResult Page3()
         {
             return View();
         }
@@ -59,11 +60,12 @@ namespace MvcRouteFlow.Web.Controllers
             return RouteFlow.Next();
         }
 
-        [RouteFlow(Path = "path-foo", Select = When.Done)]
-        public ActionResult Done()
+        [RouteFlow(Path = "path-foo", Step = 4, Select = When.Done)]
+        [RouteFlowGetCorrelation(Path = "path-foo", Value = "id")]
+        public ActionResult Done(object id)
         {
             RouteFlow.Done();
-            return View();
+            return View(id);
         }
 
     }

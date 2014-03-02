@@ -22,7 +22,7 @@ namespace MvcRouteFlow.Web.Controllers
         }
 
         [HttpPost]
-        [RouteFlowSetCorrelation(Path = "path-foo", Value = "id")]
+        [RouteFlowSetCorrelation(Path = "path-foo", As = "id", Value = "id")]
         public ActionResult Page1(string id)
         {
             return RouteFlow.Next();
@@ -61,7 +61,7 @@ namespace MvcRouteFlow.Web.Controllers
         }
 
         [RouteFlow(Path = "path-foo", Step = 4, Select = When.Done)]
-        [RouteFlowGetCorrelation(Path = "path-foo", Value = "id")]
+        [RouteFlowGetCorrelation(Path = "path-foo", Name = "id", AssignTo = "id")]
         public ActionResult Done(object id)
         {
             RouteFlow.Done();

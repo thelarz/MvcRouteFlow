@@ -11,7 +11,7 @@ namespace MvcRouteFlow.Tests
     [TestFixture()]
     public class WhenTestingTheStateManager
     {
-
+        private const string Cookie = "COOKIE";
         private StateManager sm;
 
         [SetUp]
@@ -25,12 +25,7 @@ namespace MvcRouteFlow.Tests
         {
             const string path = "test-path";
 
-            var state = sm.CreateState(new State()
-            {
-                Path = path,
-                Step = 1,
-                SessionCookie = "COOKIE"
-            });
+            var state = sm.CreateState(Cookie, path);
 
             Assert.AreEqual(state.Path, path);
 
@@ -41,12 +36,7 @@ namespace MvcRouteFlow.Tests
         {
             const string path = "test-path";
 
-            sm.CreateState(new State()
-                               {
-                                   Path = path,
-                                   Step = 1,
-                                   SessionCookie = "COOKIE"
-                               });
+            sm.CreateState(Cookie, path);
 
             var state = sm.GetState("COOKIE");
 
@@ -60,19 +50,9 @@ namespace MvcRouteFlow.Tests
             const string path = "test-reusable-state";
             const string newpath = "new-path";
 
-            sm.CreateState(new State()
-            {
-                Path = path,
-                Step = 5,
-                SessionCookie = "COOKIE"
-            });
+            sm.CreateState(Cookie, path);
 
-            var newstate = sm.CreateState(new State()
-            {
-                Path = newpath,
-                Step = 1,
-                SessionCookie = "COOKIE"
-            });
+            var newstate = sm.CreateState(Cookie, newpath);
 
             Assert.AreEqual(newstate.Path, newpath);
 
@@ -83,12 +63,7 @@ namespace MvcRouteFlow.Tests
         {
             const string path = "test-removble-state";
 
-            sm.CreateState(new State()
-            {
-                Path = path,
-                Step = 5,
-                SessionCookie = "COOKIE"
-            });
+            sm.CreateState(Cookie, path);
 
             sm.RemoveState("COOKIE");
 

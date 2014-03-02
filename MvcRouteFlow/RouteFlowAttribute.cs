@@ -59,7 +59,7 @@ namespace MvcRouteFlow
         public string NoLabel { get; set; }
     }
 
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class RouteFlowSetCorrelation : ActionFilterAttribute
     {
         public string Path { get; set; }
@@ -76,7 +76,7 @@ namespace MvcRouteFlow
         }
     }
 
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class RouteFlowGetCorrelation : ActionFilterAttribute
     {
         public string Path { get; set; }

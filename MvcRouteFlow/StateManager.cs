@@ -56,7 +56,9 @@ namespace MvcRouteFlow
         public object GetCorrelationId(string sessionid, string name)
         {
             var state = GetState(sessionid);
-            return state.CorrelationIds[name ?? "id"];
+            if (state.CorrelationIds.ContainsKey(name))
+                return state.CorrelationIds[name ?? "id"];
+            return null;
         }
 
         public void SyncronizeSteps(string id, int step)

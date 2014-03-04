@@ -104,8 +104,32 @@ namespace MvcRouteFlow
 
         public static void SetCorrelationId(string name, object id)
         {
+           
             var cookie = HttpContext.Current.Session.SessionID;
+            var state = StateManager.GetState(cookie);
+
+            if (state == null)
+            {
+                throw new ApplicationException("RouteFlow:SetCorrelationId:Session state invalid");
+            }
+
+            if (name == "key")
+            {
+                // Verify duplicate correlation key while in a session
+                // Reserved "key" is used to correlate an entire workflow to a single object id
+                var keyValue = GetCorrelationId("key");
+                if (keyValue != null)
+                {
+                    if (keyValue.ToString() != id.ToString())
+                    {
+                        throw new ApplicationException("RouteFlow:SetCorrelationId:Session key mismatch during active routeflow.");
+                    }
+                }
+            }
+
             StateManager.SetCorrelationId(cookie, name, id);
+
+
         }
 
         public static object GetCorrelationId(string name)

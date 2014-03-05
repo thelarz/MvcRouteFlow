@@ -173,6 +173,14 @@ namespace MvcRouteFlow
 
         }
 
+        public static void Skip(int skips)
+        {
+            var cookie = HttpContext.Current.Session.SessionID;
+            var state = StateManager.GetState(cookie);
+            state.Step += skips;
+            StateManager.CompleteStep(cookie);
+        }
+
         public static void Done()
         {
             var cookie = HttpContext.Current.Session.SessionID;

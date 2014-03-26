@@ -26,6 +26,14 @@ namespace MvcRouteFlow
             return endpoint;
         }
 
+        public static int GetMaxSteps(string path)
+        {
+            var stepCount =
+                Paths.FirstOrDefault(x => x.Key == path)
+                     .MaxSteps;
+            return stepCount;
+        }
+
         public static Endpoint GetBefore(string path, int step)
         {
 
@@ -147,6 +155,7 @@ namespace MvcRouteFlow
                                        Steps = new List<Step>()
                                    };
                         Paths.Add(path);
+                        
                     }
 
                     var step = path.Steps.FirstOrDefault(x => x.Id == attr.Step);
@@ -158,6 +167,7 @@ namespace MvcRouteFlow
                                        Endpoints = new List<Endpoint>()
                                    };
                         path.Steps.Add(step);
+                        path.MaxSteps++;
                     }
 
                     var item = step.Endpoints.FirstOrDefault(x => x.Select == attr.Select);

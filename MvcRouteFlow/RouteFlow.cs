@@ -30,7 +30,8 @@ namespace MvcRouteFlow
             {
                 var cookie = HttpContext.Current.Session.SessionID;
                 var state = StateManager.GetState(cookie);
-                return string.Format("CurrrentStep: {0}", state == null ? "Empty" : state.Step.ToString());
+                return string.Format("Completed/{0}/Current/{1}/Of/{2}", state == null ? "-" : state.StepCompleted.ToString(), state == null ? "-" : state.Step.ToString(),
+                    state == null ? "-" : state.MaxSteps.ToString());
             }
         }
 
@@ -81,6 +82,7 @@ namespace MvcRouteFlow
             return state.StepCompleted >= step;
         }
 
+        
         public static ActionResult Begin(string path)
         {
 
@@ -98,7 +100,7 @@ namespace MvcRouteFlow
 
             var result = PathManager.GetStartingEndpoint(path);
 
-            return new RedirectToRouteResult(new RouteValueDictionary(new { controller = result.Controller, action = result.Action }));
+            return new RedirectToRouteResult(new RouteValueDictionary(new { controller = result.Controller, action = result.Action, area = "" }));
 
         }
 
@@ -122,7 +124,7 @@ namespace MvcRouteFlow
                 {
                     if (keyValue.ToString() != id.ToString())
                     {
-                        throw new ApplicationException("RouteFlow:SetCorrelationId:Session key mismatch during active routeflow.");
+                        throw new ApplicationException("RouteFlow:SetCorrelationId:Cannot reassign the primary correlation key.");
                     }
                 }
             }
@@ -168,9 +170,9 @@ namespace MvcRouteFlow
 
             routeValues.Add("controller", result.Controller);
             routeValues.Add("action", result.Action);
+            routeValues.Add("area", "");
 
             return new RedirectToRouteResult(routeValues);
-
         }
 
         public static void Skip(int skips)

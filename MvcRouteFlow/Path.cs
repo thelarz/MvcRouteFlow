@@ -18,6 +18,7 @@ namespace MvcRouteFlow
         public string Key { get; set; }
         public string StartController { get; set; }
         public string StartAction { get; set; }
+        public int MaxSteps { get; set; }
         public List<Step> Steps { get; set; }
     }
 

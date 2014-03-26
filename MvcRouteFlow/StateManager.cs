@@ -24,6 +24,7 @@ namespace MvcRouteFlow
                                SessionCookie = cookie,
                                Path = path,
                                Step = 1,
+                               MaxSteps = PathManager.GetMaxSteps(path),
                                CorrelationIds = new Dictionary<string, object>()
                            };
             States.Add(state);
@@ -64,7 +65,12 @@ namespace MvcRouteFlow
         public void SyncronizeSteps(string id, int step)
         {
             var state = GetState(id);
-            state.StepCompleted = step - 1;
+            if (step < state.Step)
+            {
+                // we're moving backwards.
+                state.StepCompleted = step - 1;
+                state.StepOnBeforeCompleted = step - 1;
+            }
             state.Step = step;
         }
 

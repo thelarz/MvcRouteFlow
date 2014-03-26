@@ -9,6 +9,7 @@ namespace MvcRouteFlow
         public int Step { get; set; }
         public int StepCompleted { get; set; }
         public int StepOnBeforeCompleted { get; set; }
+        public int MaxSteps { get; set; }
         public Dictionary<string, object> CorrelationIds { get; set; }
     }
 }

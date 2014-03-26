@@ -10,7 +10,7 @@ using System.Web.Routing;
 namespace MvcRouteFlow
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class RouteFlowAttribute : Attribute
+    public class RouteFlowAttribute : ActionFilterAttribute
     {
         public string Path { get; set; }
         public int Step { get; set; }
@@ -19,6 +19,15 @@ namespace MvcRouteFlow
         public string Message { get; set; }
         public string Question { get; set; }
         public string Label { get; set; }
+
+        //public override void OnActionExecuting(ActionExecutingContext filterContext)
+        //{
+        //    if (!RouteFlow.OnPath(Path))
+        //        return;
+
+        //    RouteFlow.Sync(Step);
+
+        //}
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
@@ -161,8 +170,10 @@ namespace MvcRouteFlow
             filterContext.Result = new RedirectToRouteResult(
                     new RouteValueDictionary 
                     {
+                        { "step", Step },
                         { "action", "Interstitial" },
                         { "controller", "RouteFlow" },
+                        { "area", ""},
                         { "Message", model.Message },
                         { "Question", model.Question },
                         { "YesRoute", model.YesRoute },

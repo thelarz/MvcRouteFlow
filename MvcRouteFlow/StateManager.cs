@@ -40,6 +40,19 @@ namespace MvcRouteFlow
             }
         }
 
+        public void RevertBeforeCompleted(string id)
+        {
+            // really need a pop stack operation for moving backwards
+            var state = GetState(id);
+            if (state != null)
+            {
+                if (state.Step == state.StepOnBeforeCompleted)
+                {
+                    state.StepOnBeforeCompleted = state.Step - 1;
+                }
+            }
+        }
+
         public void SetCorrelationId(string sessionid, string name, object id)
         {
             var state = GetState(sessionid);
@@ -68,6 +81,7 @@ namespace MvcRouteFlow
             if (step < state.Step)
             {
                 // we're moving backwards.
+                // really need a pop stack operation for moving backwards
                 state.StepCompleted = step - 1;
                 state.StepOnBeforeCompleted = step - 1;
             }

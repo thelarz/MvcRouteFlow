@@ -140,6 +140,35 @@ namespace MvcRouteFlow
             return StateManager.GetCorrelationId(cookie, name);
         }
 
+        public static ActionResult Resume()
+        {
+
+            var routeValues = new RouteValueDictionary();
+
+            var cookie = HttpContext.Current.Session.SessionID;
+
+            var state = StateManager.GetState(cookie);
+            if (state == null)
+            {
+                throw new ApplicationException("SessionID not valid in RouteFlow table");
+            }
+
+            StateManager.RevertBeforeCompleted(cookie);
+            var result = PathManager.GetEndpoint(state.Path, state.Step);
+            if (result == null)
+            {
+                // stumped
+                return null;
+            }
+
+
+            routeValues.Add("controller", result.Controller);
+            routeValues.Add("action", result.Action);
+            routeValues.Add("area", "");
+
+            return new RedirectToRouteResult(routeValues);
+        }
+
         public static ActionResult Next()
         {
             return Next(null);

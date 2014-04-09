@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using MvcRouteFlow
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -15,7 +16,12 @@
                     <p class="site-title">@Html.ActionLink("your logo here", "Index", "Home")</p>
                 </div>
                 <div class="float-right">
-                    <span>@MvcRouteFlow.RouteFlow.Dump</span>
+                    
+                    @if (RouteFlow.Active())
+                    {
+                        <span>@RouteFlow.Dump</span>
+                        <a href="@Url.Action("Resume", "RouteFlow")">Resume</a>
+                    }
                     <section id="login">
                         @Html.Partial("_LoginPartial")
                     </section>

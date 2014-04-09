@@ -43,6 +43,11 @@ namespace MvcRouteFlow
             return View("RouteFlow", model);
         }
 
+        public ActionResult Resume()
+        {
+            return RouteFlow.Resume();
+        }
 
     }
+
 }

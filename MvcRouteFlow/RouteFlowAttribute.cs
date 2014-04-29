@@ -81,7 +81,18 @@ namespace MvcRouteFlow
                 return;
 
             var actionValues = filterContext.ActionParameters;
+            if (actionValues[Value] == null)
+            {
+                // Attempting to set a correlation with a null value (maybe due to restarting a routeflow step)
+                var value = RouteFlow.GetCorrelationId(As);
+                if (value != null)
+                {
+                    actionValues[Value] = RouteFlow.GetCorrelationId(As);
+                    return;
+                }
+            }
             RouteFlow.SetCorrelationId(As, actionValues[Value]);
+           
         }
     }
 
@@ -91,7 +102,7 @@ namespace MvcRouteFlow
         public string Path { get; set; }
         public string Name { get; set; }
         public string AssignTo { get; set; }
-
+        
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             if (!RouteFlow.OnPath(Path))

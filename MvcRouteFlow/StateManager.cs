@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MvcRouteFlow.Exceptions;
 
 namespace MvcRouteFlow
 {
@@ -78,6 +79,12 @@ namespace MvcRouteFlow
         public void SyncronizeSteps(string id, int step)
         {
             var state = GetState(id);
+
+            if (state == null)
+            {
+                throw new RouteFlowException("A RoutFlow session is not active, it has either timed-out or you're attempting to click back through pages after the workflow has completed.");
+            }
+
             if (step < state.Step)
             {
                 // we're moving backwards.

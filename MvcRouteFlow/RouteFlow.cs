@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
 using System.Web.UI.WebControls;
+using MvcRouteFlow.Exceptions;
 
 namespace MvcRouteFlow
 {
@@ -33,6 +34,17 @@ namespace MvcRouteFlow
                 return string.Format("Completed/{0}/Current/{1}/Of/{2}", state == null ? "-" : state.StepCompleted.ToString(), state == null ? "-" : state.Step.ToString(),
                     state == null ? "-" : state.MaxSteps.ToString());
             }
+        }
+
+        public static bool Active(int? id)
+        {
+            var cookie = HttpContext.Current.Session.SessionID;
+            var state = StateManager.GetState(cookie);
+            if (state == null)
+                return false;
+            if (StateManager.GetCorrelationId(cookie, "key") == null)
+                return false;
+            return (int)StateManager.GetCorrelationId(cookie, "key") == id;
         }
 
         public static bool Active()
@@ -106,13 +118,13 @@ namespace MvcRouteFlow
 
         public static void SetCorrelationId(string name, object id)
         {
-           
+            
             var cookie = HttpContext.Current.Session.SessionID;
             var state = StateManager.GetState(cookie);
 
             if (state == null)
             {
-                throw new ApplicationException("RouteFlow:SetCorrelationId:Session state invalid");
+                throw new RouteFlowException("RouteFlow:SetCorrelationId:Session state invalid");
             }
 
             if (name == "key")
@@ -124,7 +136,7 @@ namespace MvcRouteFlow
                 {
                     if (keyValue.ToString() != id.ToString())
                     {
-                        throw new ApplicationException("RouteFlow:SetCorrelationId:Cannot reassign the primary correlation key.");
+                        throw new RouteFlowException("RouteFlow:SetCorrelationId:Cannot reassign the primary correlation key.");
                     }
                 }
             }
@@ -150,7 +162,7 @@ namespace MvcRouteFlow
             var state = StateManager.GetState(cookie);
             if (state == null)
             {
-                throw new ApplicationException("SessionID not valid in RouteFlow table");
+                throw new RouteFlowException("SessionID not valid in RouteFlow table");
             }
 
             StateManager.RevertBeforeCompleted(cookie);
@@ -184,7 +196,7 @@ namespace MvcRouteFlow
             var state = StateManager.GetState(cookie);
             if (state == null)
             {
-                throw new ApplicationException("SessionID not valid in RouteFlow table");
+                throw new RouteFlowException("SessionID not valid in RouteFlow table");
             }
 
             StateManager.CompleteStep(cookie);

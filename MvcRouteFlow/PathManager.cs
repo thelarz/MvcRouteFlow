@@ -28,6 +28,9 @@ namespace MvcRouteFlow
 
         public static int GetMaxSteps(string path)
         {
+            if (!Paths.Any(x => x.Key == path))
+                return 0;
+
             var stepCount =
                 Paths.FirstOrDefault(x => x.Key == path)
                      .MaxSteps;

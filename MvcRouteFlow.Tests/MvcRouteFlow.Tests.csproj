@@ -57,7 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MvcRouteFlow\MvcRouteFlow.csproj">
-      <Project>{7BB5DC36-C4F9-4C68-93E6-B75011561436}</Project>
+      <Project>{7bb5dc36-c4f9-4c68-93e6-b75011561436}</Project>
       <Name>MvcRouteFlow</Name>
     </ProjectReference>
   </ItemGroup>

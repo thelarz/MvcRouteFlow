@@ -19,15 +19,27 @@ namespace MvcRouteFlow
         public string Message { get; set; }
         public string Question { get; set; }
         public string Label { get; set; }
+        public bool PassThru { get; set; }
 
-        //public override void OnActionExecuting(ActionExecutingContext filterContext)
-        //{
-        //    if (!RouteFlow.OnPath(Path))
-        //        return;
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            if (!RouteFlow.OnPath(Path))
+                return;
 
-        //    RouteFlow.Sync(Step);
+            RouteFlow.Sync(Step);
 
-        //}
+        }
+
+        public override void OnResultExecuted(ResultExecutedContext filterContext)
+        {
+            if (!RouteFlow.OnPath(Path))
+                return;
+
+            if (!RouteFlow.AtStep(Step))
+                return;
+
+            RouteFlow.CleanUpRequest();
+        }
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
@@ -44,7 +56,7 @@ namespace MvcRouteFlow
             if (!RouteFlow.OnPath(Path))
                 return;
 
-            RouteFlow.Sync(Step);
+            //RouteFlow.Sync(Step);
 
         }
 
@@ -133,12 +145,17 @@ namespace MvcRouteFlow
             if (!RouteFlow.OnPath(Path))
                 return;
 
-            RouteFlow.Sync(Step);
+            if (!RouteFlow.AtStep(Step))
+                return;
+
+            
+            
 
             if (RouteFlow.IsBeforeCompleted())
                 return;
 
-            
+            RouteFlow.Sync(Step);
+
 
             var routeValues = filterContext.RouteData.Values;
 
@@ -151,7 +168,7 @@ namespace MvcRouteFlow
             model.Message = this.Message;
 
             // Get the next step and load the model with the controller/actions for the different responses
-            var endpoints = PathManager.GetYesNoEndpointsForStep(state.Path, state.Step);
+            var endpoints = PathManager.GetYesNoEndpointsForStep(state.Path, state.Current.Step);
 
             var yesEndpoint = endpoints.FirstOrDefault(x => x.Select == When.Yes);
 

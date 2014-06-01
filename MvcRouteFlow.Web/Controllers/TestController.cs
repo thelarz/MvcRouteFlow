@@ -36,6 +36,7 @@ namespace MvcRouteFlow.Web.Controllers
 
         [NoCache]
         [RouteFlow(Path = "path-foo", Step = 1, Select = When.Auto)]
+        [RouteFlow(Path = "path-foo", Step = 3, Select = When.Auto)]
         public ActionResult Page1()
         {
             return View();
@@ -71,7 +72,7 @@ namespace MvcRouteFlow.Web.Controllers
         }
 
         [NoCache]
-        [RouteFlow(Path = "path-foo", Step = 3, Select = When.Auto)]
+        [RouteFlow(Path = "path-foo", Step = 4, Select = When.Auto)]
         public ActionResult Page3()
         {
             return View();
@@ -84,7 +85,7 @@ namespace MvcRouteFlow.Web.Controllers
         }
 
         [NoCache]
-        [RouteFlow(Path = "path-foo", Step = 4, Select = When.Done)]
+        [RouteFlow(Path = "path-foo", Step = 20, Select = When.Done)]
         [RouteFlowGetCorrelation(Path = "path-foo", Name = "id", AssignTo = "id")]
         public ActionResult Done(object id)
         {

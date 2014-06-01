@@ -183,6 +183,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\EasyController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\SkipController.cs" />
     <Compile Include="Controllers\TestController.cs" />
@@ -317,6 +318,10 @@
     <Content Include="Views\Skip\Page3.cshtml" />
     <Content Include="Views\Skip\Index.cshtml" />
     <Content Include="Views\Skip\Done.cshtml" />
+    <Content Include="Views\Easy\One.cshtml" />
+    <Content Include="Views\Easy\Two.cshtml" />
+    <Content Include="Views\Easy\Three.cshtml" />
+    <Content Include="Views\Easy\Done.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

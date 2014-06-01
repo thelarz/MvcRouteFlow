@@ -182,7 +182,8 @@ namespace MvcRouteFlow
                                                    Select = attr.Select,
                                                    Controller = controllerDesc.ControllerName,
                                                    Action = action.ActionName,
-                                                   Label = attr.Label
+                                                   Label = attr.Label,
+                                                   IsPassThru = attr.PassThru
                                                });
                     }
 

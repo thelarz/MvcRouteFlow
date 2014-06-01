@@ -30,9 +30,7 @@ namespace MvcRouteFlow.Web.Controllers
         }
 
         [RouteFlow(Path = "path-bar", Step = 2, Select = When.Auto)]
-        [RouteFlow(Path = "path-bar", Step = 2, Select = When.No)]
         [RouteFlowSync(Path = "path-bar", Step = 2)]
-        [RouteFlowBefore(Path = "path-bar", Step = 2, Message = "Thanks for completing step one", Question = "Would you like to skip step 2?")]
         public ActionResult Page2(int id)
         {
             return View();
@@ -40,15 +38,16 @@ namespace MvcRouteFlow.Web.Controllers
 
 
         [HttpPost]
-        public ActionResult Page2(string post)
+        public ActionResult Page2(string skip)
         {
+            if (skip.ToLower() == "skip")
+            {
+                return RouteFlow.Next(new { id = 22}, 1);
+            }
             return RouteFlow.Next(new { id = 22 });
         }
 
-        [RouteFlow(Path = "path-bar", Step = 2, Select = When.Yes)]
         [RouteFlow(Path = "path-bar", Step = 3, Select = When.Auto)]
-        [RouteFlow(Path = "path-bar", Step = 3, Select = When.Yes)]
-        [RouteFlowBefore(Path = "path-bar", Step = 3, Message = "Let's move on...", Question = "Would you like to DO step 3?")]
         [RouteFlowSync(Path = "path-bar", Step = 3)]
         public ActionResult Page3(int id)
         {
@@ -61,7 +60,6 @@ namespace MvcRouteFlow.Web.Controllers
             return RouteFlow.Next();
         }
 
-        [RouteFlow(Path = "path-bar", Step = 3, Select = When.No)]
         [RouteFlow(Path = "path-bar", Step = 4, Select = When.Auto)]
         [RouteFlowSync(Path = "path-bar", Step = 4)]
         public ActionResult Page4()

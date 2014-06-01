@@ -31,7 +31,7 @@ namespace MvcRouteFlow
             {
                 var cookie = HttpContext.Current.Session.SessionID;
                 var state = StateManager.GetState(cookie);
-                return string.Format("Completed/{0}/Current/{1}/Of/{2}", state == null ? "-" : state.StepCompleted.ToString(), state == null ? "-" : state.Step.ToString(),
+                return string.Format("Completed/{0}/Current/{1}/Of/{2}", state == null ? "-" : state.LastCompletedStep.ToString(), state == null ? "-" : state.Current.Step.ToString(),
                     state == null ? "-" : state.MaxSteps.ToString());
             }
         }
@@ -73,26 +73,37 @@ namespace MvcRouteFlow
             StateManager.SyncronizeSteps(cookie, step);
         }
 
+        public static bool AtStep(int step)
+        {
+            var cookie = HttpContext.Current.Session.SessionID;
+            var state = StateManager.GetState(cookie);
+
+            if (state == null)
+                return false;
+
+            return state.Current.Step == step;
+        }
+
         public static bool IsBeforeCompleted()
         {
             var cookie = HttpContext.Current.Session.SessionID;
             var state = StateManager.GetState(cookie);
-            return state.StepOnBeforeCompleted == state.Step;
+            return state.Current.OnBeforeCompleted;
         }
 
         public static void BeforeCompleted()
         {
             var cookie = HttpContext.Current.Session.SessionID;
             var state = StateManager.GetState(cookie);
-            state.StepOnBeforeCompleted = state.Step;
+            state.Current.OnBeforeCompleted = true;
         }
 
-        public static bool HasVisited(int step)
-        {
-            var cookie = HttpContext.Current.Session.SessionID;
-            var state = StateManager.GetState(cookie);
-            return state.StepCompleted >= step;
-        }
+        //public static bool HasVisited(int step)
+        //{
+        //    var cookie = HttpContext.Current.Session.SessionID;
+        //    var state = StateManager.GetState(cookie);
+        //    return state.StepCompleted >= step;
+        //}
 
         
         public static ActionResult Begin(string path)
@@ -166,7 +177,7 @@ namespace MvcRouteFlow
             }
 
             StateManager.RevertBeforeCompleted(cookie);
-            var result = PathManager.GetEndpoint(state.Path, state.Step);
+            var result = PathManager.GetEndpoint(state.Path, state.Current.Step);
             if (result == null)
             {
                 // stumped
@@ -183,10 +194,20 @@ namespace MvcRouteFlow
 
         public static ActionResult Next()
         {
-            return Next(null);
+            return Next(null, 0);
+        }
+
+        public static ActionResult Next(int skip)
+        {
+            return Next(null, skip);
         }
 
         public static ActionResult Next(object ids)
+        {
+            return Next(ids, 0);
+        }
+
+        public static ActionResult Next(object ids, int skip)
         {
 
             var routeValues = GetRouteValueDictionary(ids);
@@ -200,9 +221,9 @@ namespace MvcRouteFlow
             }
 
             StateManager.CompleteStep(cookie);
-            state.Step++;
+            state.Next(skip);
 
-            var result = PathManager.GetEndpoint(state.Path, state.Step);
+            var result = PathManager.GetEndpoint(state.Path, state.Current.Step);
             if (result == null)
             {
                 // stumped
@@ -216,13 +237,14 @@ namespace MvcRouteFlow
             return new RedirectToRouteResult(routeValues);
         }
 
-        public static void Skip(int skips)
-        {
-            var cookie = HttpContext.Current.Session.SessionID;
-            var state = StateManager.GetState(cookie);
-            state.Step += skips;
-            StateManager.CompleteStep(cookie);
-        }
+        //public static void Skip(int skips)
+        //{
+        //    var cookie = HttpContext.Current.Session.SessionID;
+        //    var state = StateManager.GetState(cookie);
+        //    StateManager.CompleteStep(cookie);
+        //    state.SkipThenNext(skips);
+
+        //}
 
         public static void Done()
         {
@@ -249,6 +271,14 @@ namespace MvcRouteFlow
         {
             //TODO: Extract to its own class and write some unit tests around this
             PathManager.Initialize(Assembly.GetCallingAssembly());
+
+        }
+
+        public static void CleanUpRequest()
+        {
+            var cookie = HttpContext.Current.Session.SessionID;
+            var state = StateManager.GetState(cookie);
+            state.MovingForward = false;
 
         }
 

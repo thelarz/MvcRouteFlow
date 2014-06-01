@@ -9,6 +9,8 @@ namespace MvcRouteFlow
 
         static readonly List<State> States = new List<State>();
 
+        
+
         public State GetState(string id)
         {
             return States.FirstOrDefault(x => x.SessionCookie == id);
@@ -20,16 +22,10 @@ namespace MvcRouteFlow
             {
                 RemoveState(cookie);
             }
-            var state = new State()
-                           {
-                               SessionCookie = cookie,
-                               Path = path,
-                               Step = 1,
-                               MaxSteps = PathManager.GetMaxSteps(path),
-                               CorrelationIds = new Dictionary<string, object>()
-                           };
-            States.Add(state);
-            return state;
+
+            var newstate = new State(cookie, path);
+            States.Add(newstate);
+            return newstate;
         }
 
         public void CompleteStep(string id)
@@ -37,7 +33,7 @@ namespace MvcRouteFlow
             var state = GetState(id);
             if (state != null)
             {
-                state.StepCompleted = state.Step;
+                state.Current.Completed = true;
             }
         }
 
@@ -47,9 +43,9 @@ namespace MvcRouteFlow
             var state = GetState(id);
             if (state != null)
             {
-                if (state.Step == state.StepOnBeforeCompleted)
+                if (state.Current.OnBeforeCompleted)
                 {
-                    state.StepOnBeforeCompleted = state.Step - 1;
+                    state.Current.OnBeforeCompleted = false;
                 }
             }
         }
@@ -78,21 +74,31 @@ namespace MvcRouteFlow
 
         public void SyncronizeSteps(string id, int step)
         {
+
             var state = GetState(id);
 
             if (state == null)
             {
-                throw new RouteFlowException("A RoutFlow session is not active, it has either timed-out or you're attempting to click back through pages after the workflow has completed.");
+                throw new RouteFlowException("A RoutFlow session is not active, has timed-out or an attemp was made to click back through pages after the workflow has completed.");
             }
 
-            if (step < state.Step)
+            if (state.MovingForward)
+                return;
+
+            if (step == state.Current.Step)
+                return;
+
+            // ugh are we trying to back up?
+            if (step == state.Entries.ToArray()[1].Step)
             {
-                // we're moving backwards.
-                // really need a pop stack operation for moving backwards
-                state.StepCompleted = step - 1;
-                state.StepOnBeforeCompleted = step - 1;
+                
+                state.Entries.Pop();
+
+                state.Current = state.Entries.Peek();
+                state.Current.Completed = false;
+                state.Current.OnBeforeCompleted = false;
             }
-            state.Step = step;
+            //state.Step = step;
         }
 
         public void RemoveState(string id)

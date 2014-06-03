@@ -37,6 +37,7 @@ namespace MvcRouteFlow
         public string Action { get; set; }
         public string Label { get; set; }
         public bool IsPassThru { get; set; }
+        public int StepId { get; set; }
     }
 
 }

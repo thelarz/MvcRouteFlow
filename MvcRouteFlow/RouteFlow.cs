@@ -81,7 +81,7 @@ namespace MvcRouteFlow
             if (state == null)
                 return false;
 
-            return state.Current.Step == step;
+            return step >= state.Current.Step;
         }
 
         public static bool IsBeforeCompleted()

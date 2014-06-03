@@ -183,7 +183,8 @@ namespace MvcRouteFlow
                                                    Controller = controllerDesc.ControllerName,
                                                    Action = action.ActionName,
                                                    Label = attr.Label,
-                                                   IsPassThru = attr.PassThru
+                                                   IsPassThru = attr.PassThru,
+                                                   StepId = step.Id
                                                });
                     }
 

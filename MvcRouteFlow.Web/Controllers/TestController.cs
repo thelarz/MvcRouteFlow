@@ -36,7 +36,6 @@ namespace MvcRouteFlow.Web.Controllers
 
         [NoCache]
         [RouteFlow(Path = "path-foo", Step = 1, Select = When.Auto)]
-        [RouteFlow(Path = "path-foo", Step = 3, Select = When.Auto)]
         public ActionResult Page1()
         {
             return View();
@@ -60,6 +59,9 @@ namespace MvcRouteFlow.Web.Controllers
 
         [NoCache]
         [RouteFlow(Path = "path-foo", Step = 2, Select = When.No, Label = "OptionB")]
+        [RouteFlowBefore(Path = "path-foo", Step = 7, Question = "Do Step 2B?")]
+        [RouteFlow(Path = "path-foo", Step = 7, Select = When.Auto)]
+        [RouteFlow(Path = "path-foo", Step = 7, Select = When.Yes, Label = "Ying")]
         public ActionResult Page2B()
         {
             return View();
@@ -72,7 +74,8 @@ namespace MvcRouteFlow.Web.Controllers
         }
 
         [NoCache]
-        [RouteFlow(Path = "path-foo", Step = 4, Select = When.Auto)]
+        [RouteFlow(Path = "path-foo", Step = 7, Select = When.No, Label = "Yang")]
+        [RouteFlow(Path = "path-foo", Step = 8, Select = When.Auto)]
         public ActionResult Page3()
         {
             return View();

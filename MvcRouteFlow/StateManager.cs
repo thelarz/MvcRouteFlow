@@ -33,7 +33,7 @@ namespace MvcRouteFlow
             var state = GetState(id);
             if (state != null)
             {
-                state.Current.Completed = true;
+                state.Entries.First(x => x.Step == state.Current.Step).Completed = true;
             }
         }
 
@@ -97,8 +97,12 @@ namespace MvcRouteFlow
                 state.Current = state.Entries.Peek();
                 state.Current.Completed = false;
                 state.Current.OnBeforeCompleted = false;
+                return;
+
             }
-            //state.Step = step;
+
+            state.Next();
+            
         }
 
         public void RemoveState(string id)

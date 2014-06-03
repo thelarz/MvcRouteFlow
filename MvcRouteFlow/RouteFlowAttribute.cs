@@ -26,7 +26,8 @@ namespace MvcRouteFlow
             if (!RouteFlow.OnPath(Path))
                 return;
 
-            RouteFlow.Sync(Step);
+            if (Select == When.Auto)
+                RouteFlow.Sync(Step);
 
         }
 
@@ -38,7 +39,8 @@ namespace MvcRouteFlow
             if (!RouteFlow.AtStep(Step))
                 return;
 
-            RouteFlow.CleanUpRequest();
+            if (Select == When.Auto)
+                RouteFlow.CleanUpRequest();
         }
     }
 
@@ -150,11 +152,11 @@ namespace MvcRouteFlow
 
             
             
+            RouteFlow.Sync(Step);
+
 
             if (RouteFlow.IsBeforeCompleted())
                 return;
-
-            RouteFlow.Sync(Step);
 
 
             var routeValues = filterContext.RouteData.Values;

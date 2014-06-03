@@ -38,18 +38,19 @@ namespace MvcRouteFlow
 
             var nextStep = Current.Step + skip + 1;
 
-            Current = new StateEntry()
-                          {
-                              Step = nextStep
-                          };
-
-            if (!PathManager.GetEndpoint(Path, nextStep).IsPassThru)
+            var endpoint = PathManager.GetEndpoint(Path, nextStep);
+            if (!endpoint.IsPassThru)
             {
                 Entries.Push(new StateEntry()
                                  {
-                                     Step = nextStep,
+                                     Step = endpoint.StepId,
                                  });
             }
+            Current = new StateEntry()
+            {
+                Step = endpoint.StepId
+            };
+
         }
 
         public void SkipThenNext(int skips)
@@ -69,12 +70,13 @@ namespace MvcRouteFlow
             MaxSteps = PathManager.GetMaxSteps(path);
             CorrelationIds = new Dictionary<string, object>();
             MovingForward = true;
+            
 
             Current = new StateEntry() {Step = 1};
 
             Entries.Push(new StateEntry()
                              {
-                                 Step = 1
+                                 Step = 1,
                              });
         }
 

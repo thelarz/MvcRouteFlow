@@ -322,6 +322,7 @@
     <Content Include="Views\Easy\Two.cshtml" />
     <Content Include="Views\Easy\Three.cshtml" />
     <Content Include="Views\Easy\Done.cshtml" />
+    <Content Include="Views\Skip\Page5.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

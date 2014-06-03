@@ -71,7 +71,6 @@ namespace MvcRouteFlow.Web.Controllers
         public ActionResult Page4(string post)
         {
             return RouteFlow.Next();
-            return View();
         }
 
         [RouteFlow(Path = "path-bar", Select = When.Done)]

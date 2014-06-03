@@ -38,29 +38,23 @@ namespace MvcRouteFlow
 
             var nextStep = Current.Step + skip + 1;
 
+            //this code is failing because it's looking to increment from step 3 -> 10, but there's a step 4,5,6 etc. in this path.
+
             var endpoint = PathManager.GetEndpoint(Path, nextStep);
             if (!endpoint.IsPassThru)
             {
                 Entries.Push(new StateEntry()
                                  {
                                      Step = endpoint.StepId,
+                                     Key = endpoint.Key,
                                  });
             }
             Current = new StateEntry()
             {
-                Step = endpoint.StepId
+                Step = endpoint.StepId,
+                Key = endpoint.Key,
             };
 
-        }
-
-        public void SkipThenNext(int skips)
-        {
-            Current = new StateEntry() {Step = Current.Step + skips + 1};
-
-            Entries.Push(new StateEntry()
-            {
-                Step = Current.Step + skips + 1
-            });
         }
 
         public State(string cookie, string path)
@@ -71,7 +65,6 @@ namespace MvcRouteFlow
             CorrelationIds = new Dictionary<string, object>();
             MovingForward = true;
             
-
             Current = new StateEntry() {Step = 1};
 
             Entries.Push(new StateEntry()
@@ -88,5 +81,6 @@ namespace MvcRouteFlow
         public bool Completed { get; set; }
         public bool OnBeforeCompleted { get; set; }
         public bool IsPassThru { get; set; }
+        public string Key { get; set; }
     }
 }

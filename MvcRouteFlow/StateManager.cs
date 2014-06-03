@@ -82,13 +82,19 @@ namespace MvcRouteFlow
                 throw new RouteFlowException("A RoutFlow session is not active, has timed-out or an attemp was made to click back through pages after the workflow has completed.");
             }
 
+            // We know we're moving forward normally so get out.
+
             if (state.MovingForward)
                 return;
 
+            // Someone clicked a "link" to a new step (.Next()) was not the source, so if we're 
+            // at the step we're expecting, just get out.
+            
             if (step == state.Current.Step)
                 return;
 
-            // ugh are we trying to back up?
+            // Syncronice Backward:
+            
             if (step == state.Entries.ToArray()[1].Step)
             {
                 
@@ -101,8 +107,17 @@ namespace MvcRouteFlow
 
             }
 
-            state.Next();
+            // Syncronize a Jump Forward:
+            // This little chunk of code will handle the scenario where step = 3 (when.no) on the same method
+            // with step = 10 (when.yes) and successfully make the jump from step 3 to 10 and still ask the before question.
+            // could easily break other stuff, but hopefully conditions about will cause the routine to exit prior
+            // to this code executing most of the time.
             
+            state.Current = new StateEntry()
+                                {
+                                    Step = step,
+                                };
+
         }
 
         public void RemoveState(string id)

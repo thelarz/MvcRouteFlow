@@ -94,29 +94,6 @@ namespace MvcRouteFlow
 
         }
 
-        public static Endpoint GetNextEndpoint(string path, int step)
-        {
-            var next =
-                Paths.FirstOrDefault(x => x.Key == path)
-                     .Steps.FirstOrDefault(s => s.Id == step + 1);
-
-            if (next == null)
-            {
-                var done = Paths.FirstOrDefault(x => x.Key == path)
-                                .Steps.FirstOrDefault(s => s.Endpoints.Any(x => x.Select == When.Done));
-
-                if (done == null)
-                    throw new ApplicationException(
-                        "RouteFlow: you requested next, there was no next route and no When.Done selection");
-
-                return done.Endpoints.First(e => e.Select == When.Done);
-
-            }
-
-            return next.Endpoints.FirstOrDefault(e => e.Select == When.Auto);
-
-        }
-
         public static void Initialize(Assembly assembly)
         {
             // http://stackoverflow.com/questions/15844380/scan-for-all-actions-in-the-site
@@ -179,6 +156,7 @@ namespace MvcRouteFlow
                     {
                         step.Endpoints.Add(new Endpoint()
                                                {
+                                                   Key = string.Format("{0}/{1}", controllerDesc.ControllerName, action.ActionName).GetHashCode().ToString(),
                                                    Select = attr.Select,
                                                    Controller = controllerDesc.ControllerName,
                                                    Action = action.ActionName,

@@ -30,6 +30,9 @@ namespace MvcRouteFlow
     
     public class Endpoint
     {
+        // Key is probably not needed. I only started populating it with the "controller/action".hash recently
+        // to attempt to link together all steps on a particular controller method.
+        // It's not used.
         public string Key { get; set; }
         public bool BeforeWasVisited { get; set; }
         public When Select { get; set; }

@@ -1,39 +1,93 @@
 ﻿using System;
-using System.Dynamic;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.Security;
-using System.Web.UI.WebControls;
 using MvcRouteFlow.Exceptions;
 
 namespace MvcRouteFlow
 {
+
+
+
+    /*
+     * Limitations:
+     * 
+     * Controller post must have the same route as the get so that the PathManage.GetNextEndpoint can find the controller
+     * Note: Maybe need to capture the get method controller/action (actually thought this was happening)
+     * 
+     */
+
+    public static class RouteValueDictionaryExtensions
+    {
+        public static RouteValueDictionary Extend(this RouteValueDictionary dict, object ids)
+        {
+            if (dict == null)
+                return null;
+
+            if (ids != null)
+            {
+                foreach (var prop in ids.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    dict.Add(prop.Name, prop.GetValue(ids, null));
+                }
+            }
+
+            return dict;
+        }
+    }
+
     public class RouteFlow
     {
 
-        //TODO: Get rid of all the static crap.
-
-        //TODO: Would like this to be injected by the consumer if desired.
-        public static StateManager StateManager { get; set; }
-
-        static RouteFlow()
+        public static ActionResult Begin<T>()
         {
-            StateManager = new StateManager();
+
+            //var cookie = HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName] == null
+            //           ? string.Empty
+            //           : HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName].Value;
+
+
+            HttpContext.Current.Session["routeflow"] = typeof(T).Name;
+
+            var cookie = HttpContext.Current.Session.SessionID;
+
+
+            StateManager.CreateState<T>(cookie);
+
+            var result = PathManager.GetStartingEndpoint(typeof(T).Name);
+
+            return new RedirectToRouteResult(new RouteValueDictionary(new { controller = result.Controller, action = result.Action, area = "" }));
+
         }
 
-        public static string Dump 
-        { 
-            get
-            {
-                var cookie = HttpContext.Current.Session.SessionID;
-                var state = StateManager.GetState(cookie);
-                return string.Format("Completed/{0}/Current/{1}/Of/{2}", state == null ? "-" : state.LastCompletedStep.ToString(), state == null ? "-" : state.Current.Step.ToString(),
-                    state == null ? "-" : state.MaxSteps.ToString());
-            }
+        public static void Prepare(ActionExecutingContext context)
+        {
+            var cookie = HttpContext.Current.Session.SessionID;
+            var state = StateManager.GetState(cookie);
+            if (state == null)
+                return;
+
+            state.Current.Context = context;
+        }
+
+        public static bool Active()
+        {
+            var cookie = HttpContext.Current.Session.SessionID;
+            var state = StateManager.GetState(cookie);
+            return state != null;
+        }
+
+        public static bool Active<T>()
+        {
+            var cookie = HttpContext.Current.Session.SessionID;
+            var state = StateManager.GetState(cookie);
+
+            return state != null && state.Path == typeof (T).Name;
         }
 
         public static bool Active(int? id)
@@ -42,15 +96,38 @@ namespace MvcRouteFlow
             var state = StateManager.GetState(cookie);
             if (state == null)
                 return false;
-            if (StateManager.GetCorrelationId(cookie, "key") == null)
+
+            var primaryKey = StateManager.GetCorrelationId(cookie, "key");
+
+            if (primaryKey == null)
                 return false;
-            return (int)StateManager.GetCorrelationId(cookie, "key") == id;
+
+            return (int)primaryKey == id;
         }
 
-        public static bool Active()
+        public static bool Active<T>(int? id)
         {
             var cookie = HttpContext.Current.Session.SessionID;
-            return StateManager.GetState(cookie) != null;
+            var state = StateManager.GetState(cookie);
+            if (state == null)
+                return false;
+
+            var primaryKey = StateManager.GetCorrelationId(cookie, "key");
+
+            if (primaryKey == null)
+                return false;
+            
+            return state.Path == typeof (T).Name && (int)primaryKey == id;
+        }
+
+        public static bool OnPath<T>()
+        {
+            var cookie = HttpContext.Current.Session.SessionID;
+            var state = StateManager.GetState(cookie);
+            if (state == null)
+                return false;
+
+            return (state.Path == typeof(T).Name);
         }
 
         public static bool OnPath(string path)
@@ -66,70 +143,175 @@ namespace MvcRouteFlow
             return (state.Path == path);
         }
 
-        public static void Sync(int step)
-        {
-            var cookie = HttpContext.Current.Session.SessionID;
-            var state = StateManager.GetState(cookie);
-            StateManager.SyncronizeSteps(cookie, step);
-        }
-
-        public static bool AtStep(int step)
-        {
-            var cookie = HttpContext.Current.Session.SessionID;
-            var state = StateManager.GetState(cookie);
-
-            if (state == null)
-                return false;
-
-            return step >= state.Current.Step;
-        }
-
-        public static bool IsBeforeCompleted()
-        {
-            var cookie = HttpContext.Current.Session.SessionID;
-            var state = StateManager.GetState(cookie);
-            return state.Current.OnBeforeCompleted;
-        }
-
-        public static void BeforeCompleted()
-        {
-            var cookie = HttpContext.Current.Session.SessionID;
-            var state = StateManager.GetState(cookie);
-            state.Current.OnBeforeCompleted = true;
-        }
-
-        //public static bool HasVisited(int step)
+        //public static void Sync(int step)
         //{
         //    var cookie = HttpContext.Current.Session.SessionID;
         //    var state = StateManager.GetState(cookie);
-        //    return state.StepCompleted >= step;
+        //    StateManager.SyncronizeSteps(cookie, step);
         //}
 
         
-        public static ActionResult Begin(string path)
+        public static ActionResult SkipTo(string name)
         {
+            var cookie = HttpContext.Current.Session.SessionID;
+            var state = StateManager.GetState(cookie);
+            if (state == null)
+                return null;
+            state.Current.SkipTo = name;
+            return Next(null);
+        }
 
-            //var cookie = HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName] == null
-            //           ? string.Empty
-            //           : HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName].Value;
+        public static ActionResult Next()
+        {
+            return Next(null);
+        }
 
-
-            HttpContext.Current.Session["routeflow"] = path;
+        public static ActionResult Next(object ids)
+        {
 
             var cookie = HttpContext.Current.Session.SessionID;
 
+            var state = StateManager.GetState(cookie);
+            if (state == null)
+            {
+                throw new ApplicationException("ouch, no sessionid"); // new RouteFlowException("SessionID not valid in RouteFlow table");
+            }
 
-            StateManager.CreateState(cookie, path);
+            Endpoint result;
 
-            var result = PathManager.GetStartingEndpoint(path);
+            if (string.IsNullOrEmpty(state.Current.SkipTo))
+            {
+                result = PathManager.GetNextEndpoint(state.Path, state.Current.Step, state.Current.Controller, state.Current.Action);
+            }
+            else
+            {
+                result = PathManager.GetEndpointByName(state.Path, state.Current.SkipTo);
+            }
 
-            return new RedirectToRouteResult(new RouteValueDictionary(new { controller = result.Controller, action = result.Action, area = "" }));
+            if (result == null)
+            {
+                // stumped
+                return null;
+            }
+
+            var routeValues = GetRouteValueDictionary(ids);
+
+            if (result.Correlations != null)
+            {
+                result.Correlations.ForEach(x =>
+                                                {
+                                                    if (x.Type == "SET")
+                                                        if (routeValues.ContainsKey(x.RouteItem))
+                                                            SetCorrelationId(x.Key, routeValues[x.RouteItem]);
+                                                            //SetCorrelationId(x.Key, state.Current.Context.ActionParameters[x.RouteItem]);
+                                                    if (x.Type == "GET")
+                                                    {
+                                                        var value = GetCorrelationId(x.Key);
+                                                        if (value == null && x.IsRequired)
+                                                            throw new ApplicationException(string.Format("RouteFlow Correlation ({0}) is Required but not present", x.Key));
+                                                        if (routeValues.ContainsKey(x.RouteItem))
+                                                            routeValues[x.RouteItem] = value;
+                                                        else
+                                                            routeValues.Add(x.RouteItem, value);
+                                                    }
+                                                });
+            }
+
+
+            routeValues.Add("controller", result.Controller);
+            routeValues.Add("action", result.Action);
+            routeValues.Add("area", result.Area);
+
+            routeValues.Extend(result.RouteValues);
+
+            state.Next();
+
+            state.Current.SkipTo = null;
+            state.Current.Name = result.StepName;
+
+            return new RedirectToRouteResult(routeValues); 
+        }
+
+        public static ActionResult Resume()
+        {
+
+            var cookie = HttpContext.Current.Session.SessionID;
+
+            var state = StateManager.GetState(cookie);
+            if (state == null)
+            {
+                throw new RouteFlowException("SessionID not valid in RouteFlow table");
+            }
+
+            var result = PathManager.GetEndpointByName(state.Path, state.Current.Name);
+            if (result == null)
+            {
+                // stumped
+                return null;
+            }
+
+            var routeValues = new RouteValueDictionary();
+
+            if (result.Correlations != null)
+            {
+                result.Correlations.ForEach(x =>
+                                                {
+                                                    if (x.Type == "SET")
+                                                        if (routeValues.ContainsKey(x.RouteItem))
+                                                            SetCorrelationId(x.Key, routeValues[x.RouteItem]);
+                                                            //SetCorrelationId(x.Key, state.Current.Context.ActionParameters[x.RouteItem]);
+                                                    if (x.Type == "GET")
+                                                    {
+                                                        var value = GetCorrelationId(x.Key);
+                                                        if (value == null && x.IsRequired)
+                                                            throw new ApplicationException(string.Format("RouteFlow Correlation ({0}) is Required but not present", x.Key));
+                                                        if (routeValues.ContainsKey(x.RouteItem))
+                                                            routeValues[x.RouteItem] = value;
+                                                        else
+                                                            routeValues.Add(x.RouteItem, value);
+                                                    }
+                                                });
+            }
+
+
+            routeValues.Add("controller", result.Controller);
+            routeValues.Add("action", result.Action);
+            routeValues.Add("area", result.Area);
+
+            routeValues.Extend(result.RouteValues);
+
+            state.Next();
+
+            state.Current.SkipTo = null;
+            state.Current.Name = result.StepName;
+
+            return new RedirectToRouteResult(routeValues); 
+        }
+
+        public static void Done()
+        {
+            var cookie = HttpContext.Current.Session.SessionID;
+            StateManager.RemoveState(cookie);
+        }
+
+        private static RouteValueDictionary GetRouteValueDictionary(object ids)
+        {
+            var routeValues = new RouteValueDictionary();
+            if (ids != null)
+            {
+                foreach (var prop in ids.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    routeValues.Add(prop.Name, prop.GetValue(ids, null));
+                }
+            }
+
+            return routeValues;
 
         }
 
         public static void SetCorrelationId(string name, object id)
         {
-            
+
             var cookie = HttpContext.Current.Session.SessionID;
             var state = StateManager.GetState(cookie);
 
@@ -163,125 +345,30 @@ namespace MvcRouteFlow
             return StateManager.GetCorrelationId(cookie, name);
         }
 
-        public static ActionResult Resume()
-        {
-
-            var routeValues = new RouteValueDictionary();
-
-            var cookie = HttpContext.Current.Session.SessionID;
-
-            var state = StateManager.GetState(cookie);
-            if (state == null)
-            {
-                throw new RouteFlowException("SessionID not valid in RouteFlow table");
-            }
-
-            StateManager.RevertBeforeCompleted(cookie);
-            var result = PathManager.GetEndpoint(state.Path, state.Current.Step);
-            if (result == null)
-            {
-                // stumped
-                return null;
-            }
-
-
-            routeValues.Add("controller", result.Controller);
-            routeValues.Add("action", result.Action);
-            routeValues.Add("area", "");
-
-            return new RedirectToRouteResult(routeValues);
-        }
-
-        public static ActionResult Next()
-        {
-            return Next(null, 0);
-        }
-
-        public static ActionResult Next(int skip)
-        {
-            return Next(null, skip);
-        }
-
-        public static ActionResult Next(object ids)
-        {
-            return Next(ids, 0);
-        }
-
-        public static ActionResult Next(object ids, int skip)
-        {
-
-            var routeValues = GetRouteValueDictionary(ids);
-
-            var cookie = HttpContext.Current.Session.SessionID;
-
-            var state = StateManager.GetState(cookie);
-            if (state == null)
-            {
-                throw new RouteFlowException("SessionID not valid in RouteFlow table");
-            }
-
-            StateManager.CompleteStep(cookie);
-            state.Next(skip);
-
-            var result = PathManager.GetEndpoint(state.Path, state.Current.Step);
-            if (result == null)
-            {
-                // stumped
-                return null;
-            }
-
-            routeValues.Add("controller", result.Controller);
-            routeValues.Add("action", result.Action);
-            routeValues.Add("area", "");
-
-            return new RedirectToRouteResult(routeValues);
-        }
-
-        //public static void Skip(int skips)
-        //{
-        //    var cookie = HttpContext.Current.Session.SessionID;
-        //    var state = StateManager.GetState(cookie);
-        //    StateManager.CompleteStep(cookie);
-        //    state.SkipThenNext(skips);
-
-        //}
-
-        public static void Done()
-        {
-            var cookie = HttpContext.Current.Session.SessionID;
-            StateManager.RemoveState(cookie);
-        }
-
-        private static RouteValueDictionary GetRouteValueDictionary(object ids)
-        {
-            var routeValues = new RouteValueDictionary();
-            if (ids != null)
-            {
-                foreach (var prop in ids.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                {
-                    routeValues.Add(prop.Name, prop.GetValue(ids, null));
-                }
-            }
-
-            return routeValues;
-
-        }
+        
 
         public static void Register()
         {
             //TODO: Extract to its own class and write some unit tests around this
-            PathManager.Initialize(Assembly.GetCallingAssembly());
+            Initialize(Assembly.GetCallingAssembly());
 
         }
 
-        public static void CleanUpRequest()
+        public static void Initialize(Assembly assembly)
         {
-            var cookie = HttpContext.Current.Session.SessionID;
-            var state = StateManager.GetState(cookie);
-            state.MovingForward = false;
+            // http://stackoverflow.com/questions/15844380/scan-for-all-actions-in-the-site
+
+
+            var handlers = assembly.GetTypes().Where(type => type.GetInterfaces()
+                .Contains(typeof(IHandleRouteFlowInitialization)))
+                .Select(x => Activator.CreateInstance(x) as IHandleRouteFlowInitialization).ToList();
+            handlers.ForEach(x => x.Setup());
 
         }
 
     }
-   
+
+    
+
+
 }

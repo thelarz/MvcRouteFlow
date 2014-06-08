@@ -9,89 +9,82 @@ using System.Web.Routing;
 
 namespace MvcRouteFlow
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+
+    
+
+   
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class RouteFlowAttribute : ActionFilterAttribute
     {
-        public string Path { get; set; }
-        public int Step { get; set; }
-        public int GoTo { get; set; }
-        public When Select { get; set; }
-        public string Message { get; set; }
-        public string Question { get; set; }
-        public string Label { get; set; }
-        public bool PassThru { get; set; }
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (!RouteFlow.OnPath(Path))
-                return;
-
-            if (Select == When.Auto)
-                RouteFlow.Sync(Step);
-
+            RouteFlow.Prepare(filterContext);
         }
 
-        public override void OnResultExecuted(ResultExecutedContext filterContext)
-        {
-            if (!RouteFlow.OnPath(Path))
-                return;
+        //public override void OnResultExecuted(ResultExecutedContext filterContext)
+        //{
+        //    if (!RouteFlow.OnPath(Path))
+        //        return;
 
-            if (!RouteFlow.AtStep(Step))
-                return;
+        //    if (!RouteFlow.AtStep(Step))
+        //        return;
 
-            if (Select == When.Auto)
-                RouteFlow.CleanUpRequest();
-        }
+        //    if (Select == When.Auto)
+        //        RouteFlow.CleanUpRequest();
+        //}
     }
+    /*
+   [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+   public class RouteFlowSync : ActionFilterAttribute
+   {
 
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class RouteFlowSync : ActionFilterAttribute
-    {
+       public string Controller { get; set; }
+       public string Action { get; set; }
+       public int Step { get; set; }
+       public string Path { get; set; }
 
-        public string Controller { get; set; }
-        public string Action { get; set; }
-        public int Step { get; set; }
-        public string Path { get; set; }
+       public override void OnActionExecuting(ActionExecutingContext filterContext)
+       {
+           if (!RouteFlow.OnPath(Path))
+               return;
 
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
-        {
-            if (!RouteFlow.OnPath(Path))
-                return;
+           //RouteFlow.Sync(Step);
 
-            //RouteFlow.Sync(Step);
-
-        }
-
-
-
-        public override void OnActionExecuted(ActionExecutedContext filterContext)
-        {
-            base.OnActionExecuted(filterContext);
-        }
+       }
 
 
-    }
 
-    public class RouteFlowViewModel
-    {
-        public string Question { get; set; }
-        public string Message { get; set; }
-        public string YesRoute { get; set; }
-        public string YesLabel { get; set; }
-        public string NoRoute { get; set; }
-        public string NoLabel { get; set; }
-    }
+       public override void OnActionExecuted(ActionExecutedContext filterContext)
+       {
+           base.OnActionExecuted(filterContext);
+       }
+
+
+   }
+
+   public class RouteFlowViewModel
+   {
+       public string Question { get; set; }
+       public string Message { get; set; }
+       public string YesRoute { get; set; }
+       public string YesLabel { get; set; }
+       public string NoRoute { get; set; }
+       public string NoLabel { get; set; }
+   }
+   */
+
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class RouteFlowSetCorrelation : ActionFilterAttribute
     {
-        public string Path { get; set; }
+        public Type Path { get; set; }
         public string As { get; set; }
         public string Value { get; set; }
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (!RouteFlow.OnPath(Path))
+            if (!RouteFlow.OnPath(Path.Name))
                 return;
 
             var actionValues = filterContext.ActionParameters;
@@ -113,13 +106,13 @@ namespace MvcRouteFlow
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class RouteFlowGetCorrelation : ActionFilterAttribute
     {
-        public string Path { get; set; }
+        public Type Path { get; set; }
         public string Name { get; set; }
         public string AssignTo { get; set; }
-        
+
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (!RouteFlow.OnPath(Path))
+            if (!RouteFlow.OnPath(Path.Name))
                 return;
 
             var actionValues = filterContext.ActionParameters;
@@ -128,6 +121,7 @@ namespace MvcRouteFlow
         }
     }
 
+    /*
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class RouteFlowBefore : ActionFilterAttribute
     {
@@ -238,5 +232,5 @@ namespace MvcRouteFlow
 
 
     }
-
+    */
 }

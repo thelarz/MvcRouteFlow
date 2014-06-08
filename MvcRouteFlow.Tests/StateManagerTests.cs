@@ -8,26 +8,50 @@ using NUnit.Framework;
 
 namespace MvcRouteFlow.Tests
 {
+
+    public class TestFlow : IHandleRouteFlowInitialization
+    {
+
+        public void Setup()
+        {
+            var flow = new Path<TestFlow>()
+
+                .AddStep(new SimpleStep()
+                             {
+                                 Name = "Test-Page1",
+                                 Controller = "Test",
+                                 Action = "Page1"
+
+                             })
+                .Install();
+        }
+
+        public void TearDown()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [TestFixture()]
     public class WhenTestingTheStateManager
     {
         private const string Cookie = "COOKIE";
         private StateManager sm;
 
+
+
         [SetUp]
         public void Setup()
         {
-            sm = new StateManager();
         }
 
         [Test()]
         public void NewStatesAreCreatedCorrectly()
         {
-            const string path = "test-path";
 
-            var state = sm.CreateState(Cookie, path);
+            var state = StateManager.CreateState<TestFlow>(Cookie);
 
-            Assert.AreEqual(state.Path, path);
+            Assert.AreEqual(state.Path, typeof (TestFlow).Name);
 
         }
 
@@ -36,38 +60,24 @@ namespace MvcRouteFlow.Tests
         {
             const string path = "test-path";
 
-            sm.CreateState(Cookie, path);
+            var state1 = StateManager.CreateState<TestFlow>(Cookie);
+            var state2 = StateManager.CreateState<TestFlow>("COOKIE");
 
-            var state = sm.GetState("COOKIE");
-
-            Assert.AreEqual(state.Path, path);
-
-        }
-
-        [Test()]
-        public void StatesCanBeReused()
-        {
-            const string path = "test-reusable-state";
-            const string newpath = "new-path";
-
-            sm.CreateState(Cookie, path);
-
-            var newstate = sm.CreateState(Cookie, newpath);
-
-            Assert.AreEqual(newstate.Path, newpath);
+            Assert.AreEqual(state1.Path, state2.Path);
 
         }
 
+        
         [Test()]
         public void StatesCanBeRemoved()
         {
             const string path = "test-removble-state";
 
-            sm.CreateState(Cookie, path);
+            var state = StateManager.CreateState<TestFlow>(Cookie);
+            
+            // remove state here
 
-            sm.RemoveState("COOKIE");
-
-            var state = sm.GetState("COOKIE");
+            state = StateManager.GetState("COOKIE");
 
             Assert.IsNull(state);
 

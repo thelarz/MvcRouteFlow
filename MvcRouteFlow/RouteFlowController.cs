@@ -28,10 +28,10 @@ namespace MvcRouteFlow
     {
 
         [NoCache]
-        public ActionResult Interstitial(int step, string message, string question, string yesroute, string yeslabel, string noroute, string nolabel)
+        public ActionResult Interstitial(string message, string question, string yesroute, string yeslabel, string noroute, string nolabel)
         {
-            RouteFlow.Sync(step);
-            var model = new RouteFlowViewModel()
+            //RouteFlow.Sync(step);
+            var model = new InterstitialViewModel()
                             {
                                 Message = message,
                                 Question = question,
@@ -41,6 +41,18 @@ namespace MvcRouteFlow
                                 NoLabel = nolabel
                             };
             return View("RouteFlow", model);
+        }
+
+        [HttpPost]
+        public ActionResult NextNO(string skiptono)
+        {
+            return RouteFlow.SkipTo(skiptono);
+        }
+
+        [HttpPost]
+        public ActionResult NextYES(string skiptoyes)
+        {
+            return RouteFlow.SkipTo(skiptoyes);
         }
 
         public ActionResult Resume()

@@ -1,30 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Mvc;
 
 namespace MvcRouteFlow
 {
+
+    
+
     public class State
     {
         
         public string SessionCookie { get; set; }
         public string Path { get; set; }
-        public int MaxSteps { get; set; }
+        //public int MaxSteps { get; set; }
         public Dictionary<string, object> CorrelationIds { get; set; }
-        public bool MovingForward { get; set; }
+        //public bool MovingForward { get; set; }
 
-        public Stack<StateEntry> Entries = new Stack<StateEntry>();
+        public Stack<StateEntry> History = new Stack<StateEntry>();
         public StateEntry Current { get; set; }
+        
 
-        public int LastCompletedStep
-        {
-            get 
-            { 
-                // using FirstOrDefault because stacks work in reverse.
-                var lastcompleted = Entries.FirstOrDefault(x => x.Completed);
-                return lastcompleted == null ? 0 : lastcompleted.Step;
-            }
-        }
+        //public int LastCompletedStep
+        //{
+        //    get 
+        //    { 
+        //        // using FirstOrDefault because stacks work in reverse.
+        //        var lastcompleted = Entries.FirstOrDefault(x => x.Completed);
+        //        return lastcompleted == null ? 0 : lastcompleted.Step;
+        //    }
+        //}
 
         public void Next()
         {
@@ -33,27 +38,28 @@ namespace MvcRouteFlow
 
         public void Next(int skip)
         {
-            
-            MovingForward = true;
+
+            //MovingForward = true;
 
             var nextStep = Current.Step + skip + 1;
+            Current.Step = Current.Step + skip + 1;
 
             //this code is failing because it's looking to increment from step 3 -> 10, but there's a step 4,5,6 etc. in this path.
 
-            var endpoint = PathManager.GetEndpoint(Path, nextStep);
-            if (!endpoint.IsPassThru)
-            {
-                Entries.Push(new StateEntry()
-                                 {
-                                     Step = endpoint.StepId,
-                                     Key = endpoint.Key,
-                                 });
-            }
-            Current = new StateEntry()
-            {
-                Step = endpoint.StepId,
-                Key = endpoint.Key,
-            };
+            //var endpoint = PathManager.GetEndpoint(Path, nextStep);
+            //if (!endpoint.IsPassThru)
+            //{
+            //    Entries.Push(new StateEntry()
+            //                     {
+            //                         Step = endpoint.StepId,
+            //                         Key = endpoint.Key,
+            //                     });
+            //}
+            //Current = new StateEntry()
+            //{
+            //    Step = endpoint.StepId,
+            //    Key = endpoint.Key,
+            //};
 
         }
 
@@ -61,13 +67,13 @@ namespace MvcRouteFlow
         {
             SessionCookie = cookie;
             Path = path;
-            MaxSteps = PathManager.GetMaxSteps(path);
+            //MaxSteps = PathManager.GetMaxSteps(path);
             CorrelationIds = new Dictionary<string, object>();
-            MovingForward = true;
+            //MovingForward = true;
             
-            Current = new StateEntry() {Step = 1};
+            Current = new StateEntry() { Step = 1 };
 
-            Entries.Push(new StateEntry()
+            History.Push(new StateEntry()
                              {
                                  Step = 1,
                              });
@@ -82,5 +88,24 @@ namespace MvcRouteFlow
         public bool OnBeforeCompleted { get; set; }
         public bool IsPassThru { get; set; }
         public string Key { get; set; }
+        public ActionExecutingContext Context { get; set; }
+        public string Name { get; set; }
+        
+        public string Controller 
+        { 
+            get
+            {
+                return (string)Context.RouteData.Values["controller"];
+            } 
+        }
+        public string Action
+        {
+            get
+            {
+                return (string)Context.RouteData.Values["action"];
+            }
+        }
+        public string SkipTo { get; set; }
+
     }
 }

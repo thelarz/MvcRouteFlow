@@ -69,7 +69,7 @@ namespace MvcRouteFlow
             return this;
         }
     
-}
+    }
 
     public class SimpleStep : ISimpleStep
     {
@@ -121,13 +121,12 @@ namespace MvcRouteFlow
         public string YesLabel { get; set; }
         public string NoRoute { get; set; }
         public string NoLabel { get; set; }
+
         public Interstitial After(string name)
         {
             Previous = name;
             return this;
         }
-
-
         
         public Interstitial()
         {

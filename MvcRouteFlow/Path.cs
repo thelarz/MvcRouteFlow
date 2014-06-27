@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using MvcRouteFlow.Exceptions;
 
 namespace MvcRouteFlow
 {
@@ -7,6 +9,10 @@ namespace MvcRouteFlow
     {
         string Name { get; set; }
         List<IStep> Steps { get; set; }
+        IPath AddStep(IStep step);
+        IPath Install();
+        void Remove();
+
     }
 
     public class Path<T> : IPath
@@ -22,7 +28,7 @@ namespace MvcRouteFlow
             Name = typeof (T).Name;
         }
         
-        public Path<T> AddStep(IStep step)
+        public IPath AddStep(IStep step)
         {
             if (Steps == null)
             {
@@ -36,43 +42,18 @@ namespace MvcRouteFlow
 
         public IPath Install()
         {
+            if (Steps == null)
+            {
+                throw new RouteFlowException(string.Format("RouteFlow:No steps found on Path ({0})", this.Name));
+            }
             PathManager.Install(this);
             return this;
         }
 
+        public void Remove()
+        {
+            PathManager.Remove(this);
+        }
+
     }
-
-    public enum When
-    {
-        Auto,
-        Yes,
-        No,
-        Done,
-        After,
-        Before
-    }
-    
-    public class Endpoint
-    {
-        
-        public string Controller { get; set; }
-        public string Action { get; set; }
-        public string Area { get; set; }
-        public object RouteValues { get; set; }
-        public List<Correlation> Correlations { get; set; }
-        public string StepName { get; set; }
-
-        // Key is probably not needed. I only started populating it with the "controller/action".hash recently
-        // to attempt to link together all steps on a particular controller method.
-        // It's not used.
-
-        //public string Key { get; set; }
-        //public bool BeforeWasVisited { get; set; }
-        //public When Select { get; set; }
-        //public string Label { get; set; }
-        //public bool IsPassThru { get; set; }
-        //public int StepId { get; set; }
-        
-    }
-
 }

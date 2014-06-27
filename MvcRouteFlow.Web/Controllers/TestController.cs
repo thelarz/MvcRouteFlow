@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using MvcRouteFlow.Web.RouteFlowDefinitions;
 
 namespace MvcRouteFlow.Web.Controllers
 {
@@ -29,40 +30,32 @@ namespace MvcRouteFlow.Web.Controllers
     public class TestController : Controller
     {
         
+        [RouteFlow]
         public ActionResult Index()
         {
-            return RouteFlow.Begin("path-foo");
+            return RouteFlow.Begin<TestFlow>();
         }
 
         [NoCache]
-        [RouteFlow(Path = "path-foo", Step = 1, Select = When.Auto)]
+        [RouteFlow]
         public ActionResult Page1()
         {
             return View();
         }
 
         [HttpPost, NoCache]
-        [RouteFlowSetCorrelation(Path = "path-foo", As = "id", Value = "id")]
+        //[RouteFlowSetCorrelation(Path = "path-foo", As = "id", Value = "id")]
         public ActionResult Page1(string id)
         {
             return RouteFlow.Next();
         }
 
         [NoCache]
-        [RouteFlow(Path = "path-foo", Step = 2, Select = When.Auto)]
-        [RouteFlowBefore(Path = "path-foo", Step = 2, Message = "Thanks for completing step one", Question = "Please choose OptionA or OptionB")]
-        [RouteFlow(Path = "path-foo", Step = 2, Select = When.Yes, Label = "OptionA")]
+        [RouteFlow]
+        //[RouteFlow(Path = "path-foo", Step = 2, Select = When.Auto)]
+        //[RouteFlowBefore(Path = "path-foo", Step = 2, Message = "Thanks for completing step one", Question = "Please choose OptionA or OptionB")]
+        //[RouteFlow(Path = "path-foo", Step = 2, Select = When.Yes, Label = "OptionA")]
         public ActionResult Page2()
-        {
-            return View();
-        }
-
-        [NoCache]
-        [RouteFlow(Path = "path-foo", Step = 2, Select = When.No, Label = "OptionB")]
-        [RouteFlowBefore(Path = "path-foo", Step = 7, Question = "Do Step 2B?")]
-        [RouteFlow(Path = "path-foo", Step = 7, Select = When.Auto)]
-        [RouteFlow(Path = "path-foo", Step = 7, Select = When.Yes, Label = "Ying")]
-        public ActionResult Page2B()
         {
             return View();
         }
@@ -74,8 +67,9 @@ namespace MvcRouteFlow.Web.Controllers
         }
 
         [NoCache]
-        [RouteFlow(Path = "path-foo", Step = 7, Select = When.No, Label = "Yang")]
-        [RouteFlow(Path = "path-foo", Step = 8, Select = When.Auto)]
+        [RouteFlow]
+        //[RouteFlow(Path = "path-foo", Step = 7, Select = When.No, Label = "Yang")]
+        //[RouteFlow(Path = "path-foo", Step = 8, Select = When.Auto)]
         public ActionResult Page3()
         {
             return View();
@@ -88,8 +82,8 @@ namespace MvcRouteFlow.Web.Controllers
         }
 
         [NoCache]
-        [RouteFlow(Path = "path-foo", Step = 20, Select = When.Done)]
-        [RouteFlowGetCorrelation(Path = "path-foo", Name = "id", AssignTo = "id")]
+        //[RouteFlow(Path = "path-foo", Step = 20, Select = When.Done)]
+        //[RouteFlowGetCorrelation(Path = "path-foo", Name = "id", AssignTo = "id")]
         public ActionResult Done(object id)
         {
             RouteFlow.Done();

@@ -42,6 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Endpoint.cs" />
+    <Compile Include="HttpSessionProvider.cs" />
+    <Compile Include="IRouteFlowSessionProvider.cs" />
     <Compile Include="Exceptions\RouteFlowException.cs" />
     <Compile Include="IHandleRouteFlowInitialization.cs" />
     <Compile Include="InterstitialViewModel.cs" />

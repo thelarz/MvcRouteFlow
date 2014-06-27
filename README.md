@@ -85,7 +85,7 @@ Here's a sample controller (also available in the repo).
 ### RouteFlow Attributes/Filters ###
 
 * RouteFlow - Main Attribute/Filter to control flow of controller actions.
-* RouteFlowBefore - This filter tells RouteFlow to render an interstitial and as; the user a question.
+* RouteFlowBefore - This filter tells RouteFlow to render an interstitial and ask the user a question.
 * RouteFlowSync - Used to manually syncronize step numbers after a step has been skipped.
 
 ### RouteFlow Parameters ###

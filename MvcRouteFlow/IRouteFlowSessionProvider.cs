@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace MvcRouteFlow
 {
-
-    public interface IHandleRouteFlowInitialization
+    public interface IProvideRouteFlowSession
     {
-        void Setup();
-        void TearDown();
+        string SessionId { get; }
     }
-
 }

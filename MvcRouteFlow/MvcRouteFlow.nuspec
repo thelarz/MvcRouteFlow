@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>MvcRouteFlow</id>
+    <version>1.0.0.0</version>
+    <title>MvcRouteFlow</title>
+    <authors>McNutt Consulting</authors>
+    <owners>McNutt Consulting</owners>
+    <projectUrl>https://github.com/thelarz/MvcRouteFlow</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A Fluent class based workflow engine for ASP.NET MVC Controller Actions</description>
+    <summary>Allows developers to render sequences of pages by organizing controller actions together with a fluent class definition</summary>
+    <language>es-US</language>
+    <tags>MVC workflow page sequence routing</tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+</package>

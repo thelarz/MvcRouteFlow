@@ -91,6 +91,7 @@
     <Compile Include="Step.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="MvcRouteFlow.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

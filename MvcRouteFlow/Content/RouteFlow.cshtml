@@ -1,0 +1,24 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "RouteFlow";
+}
+
+<h2>RouteFlow has a question for you</h2>
+
+<br />
+<br />
+
+<p style="text-align: center; font-size: 1.3em">
+    @Model.Message
+</p>
+
+<p style="text-align: center;">
+    @Model.Question
+</p>
+
+<p style="text-align: center;">
+    <a href="@Model.YesRoute">@Model.YesLabel</a>
+    <a href="@Model.NoRoute">@Model.NoLabel</a>
+</p>
+

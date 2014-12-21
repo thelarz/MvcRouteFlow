@@ -16,7 +16,7 @@
     </dependencies>
   </metadata>
   <files>
-	  <file src="..\..\MvcRouteFlow\obj\Debug\MvcRouteFlow.dll" target="lib" />
-	  <file src="..\..\MvcRouteFlow\obj\Debug\MvcRouteFlow.pdb" target="lib" />
+	  <file src="MvcRouteFlow\obj\Debug\MvcRouteFlow.dll" target="lib" />
+	  <file src="MvcRouteFlow\obj\Debug\MvcRouteFlow.pdb" target="lib" />
   </files>
 </package>

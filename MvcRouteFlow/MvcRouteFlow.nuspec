@@ -18,5 +18,6 @@
   <files>
 	  <file src="obj\Debug\MvcRouteFlow.dll" target="lib" />
 	  <file src="obj\Debug\MvcRouteFlow.pdb" target="lib" />
+    <file src="Views\Shared\RouteFlow.cshtml" target="Views\Shared\RouteFlow.cshtml" />
   </files>
 </package>

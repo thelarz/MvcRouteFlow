@@ -29,12 +29,6 @@ namespace MvcRouteFlow.Web.RouteFlowDefinitions
                                 Controller = "Test",
                                 Action = "Page3"
                             }.After("page-2"))
-                .AddStep(new SimpleStep()
-                            {
-                                Name = "page-4",
-                                Controller = "Test",
-                                Action = "Page4"
-                            }.After("page-4"))
                 .Install();
 
         }

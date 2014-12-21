@@ -14,5 +14,9 @@
     <tags>MVC workflow page sequence routing</tags>
     <dependencies>
     </dependencies>
+	<files>
+	  <file src="..\..\obj\Release\MvcRouteFlow.dll" target="lib" />
+	  <file src="..\..\obj\Release\MvcRouteFlow.pdb" target="lib" />
+  </files>
   </metadata>
 </package>
